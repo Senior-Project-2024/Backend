@@ -1,0 +1,28 @@
+### create a new user
+POST http://localhost:3000/auth/signup
+Content-Type: application/json
+
+{
+    "email": "pomzaza2@mail.com",
+    "password": "pom2",
+    "username": "pomzaza2",
+    "fName": "kunkit",
+    "lName": "Kaewchotchuangkul",
+    "telNo": "0646498841",
+    "role": "user"
+}
+
+### sign in 
+POST http://localhost:3000/auth/signin
+Content-Type: application/json
+
+{
+    "email": "tyzaza7@mail.com",
+    "password": "party"
+}
+
+###
+POST http://localhost:3000/auth/signout
+
+###
+GET http://localhost:3000/auth/whoAmI
