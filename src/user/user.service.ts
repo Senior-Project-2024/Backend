@@ -31,9 +31,13 @@ export class UserService {
 
   }
 
+  async findAllUser(){
+    const user = await this.userRepo.find({});
+    return user;
+  } 
+
   async find(email: string) {
     const user = await this.userRepo.find({ where: { email }});
-
     return user;
   }
 
