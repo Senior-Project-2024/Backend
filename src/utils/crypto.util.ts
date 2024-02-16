@@ -37,6 +37,10 @@ export class Crypto {
     
     const tag = cipher.getAuthTag();
 
+    console.log('tag' + tag.toString('base64').length)
+    console.log('iv' + iv.toString('base64').length)
+    console.log('encrypted' + encrypted.toString('base64').length)
+
     return Buffer.concat([iv, tag, encrypted]).toString('base64');
   }
 

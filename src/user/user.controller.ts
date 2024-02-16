@@ -27,6 +27,11 @@ export class UserController {
   @Post('/signup')
   @Serialize(UserResponseDto)
   async createUser(@Body() body: CreateUserDto, @Session() session: IAppSession): Promise<User> {
+
+    if(body.role === UserRole.user) {
+      body.organizeName = '';
+    }
+
     const user = await this.authService.signUp(body);
     // session.userId = user.id;
     return user;
@@ -42,7 +47,8 @@ export class UserController {
   }
 
   @Get('/whoAmI')
-  getCurrentUser(@CurrentUser() user: User) {
+  getCurrentUser(@CurrentUser() user: User, @Session() session: IAppSession) {
+    console.log(session);
     return user;
   }
 

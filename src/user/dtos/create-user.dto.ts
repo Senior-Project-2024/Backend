@@ -10,7 +10,7 @@ export class CreateUserDto {
   password: string;
 
   @IsString()
-  username: string;
+  organizeName: string;
 
   @IsString()
   fName: string;

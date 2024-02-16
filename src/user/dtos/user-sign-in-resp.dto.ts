@@ -12,7 +12,7 @@ export class UserSignInRespDto{
 
   password: string;
 
-  username: string;
+  organizeName: string;
 
   @Expose()
   fName: string;

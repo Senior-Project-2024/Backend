@@ -15,7 +15,7 @@ export class User {
   password: string;
 
   @Column()
-  username: string;
+  organizeName: string;
 
   @Column()
   fName: string;
