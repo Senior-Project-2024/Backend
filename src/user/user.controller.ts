@@ -71,16 +71,22 @@ export class UserController {
 
     return this.authService.generateTokenApi(user.id.toString()); // just save it to database 
   }
-
+  
+  @Get('/all')
+  findAlltable(){
+    return this.userService.findAllUser();
+  }
+  
   @Get('/:id')
   async findUser(@Param('id') id: string) { // param is only string, we should parseInt before send to servicethis.userService.findOne(id)
     return this.userService.findOne(id);
   }
-
+  
   @Get('')
   findAllUsers(@Query('email') email: string) { // not check 
     return this.userService.find(email);
   }
+
 
   @Delete('/:id')
   removeUser(@Param('id') id: string) { // not check
