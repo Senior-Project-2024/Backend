@@ -30,6 +30,11 @@ export class UserController {
 
     if(body.role === UserRole.user) {
       body.organizeName = '';
+      body.landlineNumber = '';
+    }
+
+    if(body.role === UserRole.organization) {
+      body.telNo = '';
     }
 
     const user = await this.authService.signUp(body);

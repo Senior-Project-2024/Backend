@@ -91,6 +91,8 @@ export class AuthService {
   }
 
   async generateTokenApi(id: string): Promise<CreateTokenApiRespDto> {
+
+    console.log(id.toString().length)
     
     // encrypt userId with TOKEN_API_KEY
     const tokenApi: string = this.crypto.encryptAES256( id.toString(), 'TOKEN_API_KEY', 'AES256_GCM');
