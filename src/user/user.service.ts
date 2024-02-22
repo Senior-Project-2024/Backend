@@ -47,6 +47,10 @@ export class UserService {
     return user;
   }
 
+  async findByLandlineNumber(landlineNumber : string) {
+    return await this.userRepo.find({where : {landlineNumber}})
+  }
+
   async update(id: string, attrs: Partial<User>) {
     // 1. find that by id
     const user = await this.findOne(id); 

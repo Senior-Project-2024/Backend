@@ -10,6 +10,7 @@ import { Web3App } from 'src/utils/web3.util';
 import { Web3Account } from 'web3-eth-accounts';
 import { KeyStore } from 'web3';
 import { Crypto } from '../utils/crypto.util';
+import { UserRole } from './user.constant';
 
 const scrypt = promisify(_scrpyt);
 
@@ -29,10 +30,18 @@ export class AuthService {
       throw new BadRequestException('email already in use!.');
     }
 
-    const [userByTelNo] = await this.userService.findByTelNo(userDto.telNo);
+    if(userDto.role == UserRole.user){
+      const [userByTelNo] = await this.userService.findByTelNo(userDto.telNo);
+      if(userByTelNo){
+        throw new BadRequestException('telNo already in use!.');
+      }
+    }
 
-    if(userByTelNo) {
-      throw new BadRequestException('telNo already in use!.');
+    if(userDto.role == UserRole.organization) {
+      const [userByLandlineNumber] = await this.userService.findByLandlineNumber(userDto.telNo);
+      if(userByLandlineNumber){
+        throw new BadRequestException('LandlineNumber already in use!.');
+      }
     }
 
     //2. hash password

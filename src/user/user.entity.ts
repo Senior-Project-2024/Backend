@@ -27,6 +27,9 @@ export class User {
   telNo: string;
 
   @Column()
+  landlineNumber : string;
+
+  @Column()
   keyStoreJsonV3: KeyStore;
 
   @Column()
