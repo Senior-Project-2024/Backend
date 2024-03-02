@@ -11,6 +11,8 @@ import { Web3Account } from 'web3-eth-accounts';
 import { KeyStore } from 'web3';
 import { Crypto } from '../utils/crypto.util';
 import { UserRole } from './user.constant';
+import * as nodemailer from 'nodemailer';
+import { ConfigService } from '@nestjs/config';
 
 const scrypt = promisify(_scrpyt);
 
@@ -19,7 +21,8 @@ export class AuthService {
   
   constructor(
     private userService: UserService,
-    private crypto: Crypto
+    private crypto: Crypto,
+    private readonly configService: ConfigService
     ) {}
   
   async signUp(userDto: CreateUserDto): Promise<User> {
@@ -75,9 +78,15 @@ export class AuthService {
   async signIn(email: string, password: string): Promise<UserSignInRespDto> {
     //1. find user is exist in db ?
     const [user] = await this.userService.find(email);
+    console.log(user)
 
     if(!user) {
       throw new NotFoundException('user not found!.');
+    }
+
+    // 1.5 check Confirmation email
+    if(!user.isConfirm) {
+      throw new BadRequestException('Your email is not verified');
     }
 
     //2. get salt from db
@@ -135,6 +144,97 @@ export class AuthService {
 
     return true;
   }
+
+  async sendEmail(email : string){
+    // create transporter
+    const transporter = nodemailer.createTransport({
+      host: this.configService.get<string>("MAIL_HOST"),
+      port: this.configService.get<number>("MAIL_PORT"),
+      auth: {
+        user: this.configService.get<string>("MAIL_USER"),
+        pass: this.configService.get<string>("MAIL_PASSWORD")
+      }
+    });
+    
+    const timestamp : Date = new Date();
+    const hashCode = this.crypto.getSHA256(email, "hex");
+    const user = await this.userService.findByEmailAndUpdateHashCode(email, hashCode);
+    // timeStamp will be string and will be set GMT+7 already
+    const link = this.configService.get<string>("HOST") + "/auth/confirmEmail?hashCode=" + hashCode + "&timeStamp=" + timestamp;
+    try{
+      const resEmail = await transporter.sendMail({
+        from: {name : "ProveSelf" , address : "pathinya19@gmail.com"}, // sender address
+        to: [{name : user.fName + " " + user.lName , address : email}], // list of receivers
+        subject: "Hello ✔", // Subject line
+        text: "Hello world?", // plain text body
+        html: `<!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
+          <title>Document</title>
+          <style>
+            .head{
+              width: 100%;
+              display: flex;
+              flex-direction: column;
+              margin-top: 30px;
+            }
+            .header{
+              font-size: 24px;
+            }
+            .text20{
+              font-size: 20px;
+            }
+            .text18{
+              font-size: 18px;
+            }
+            .maginAuto{
+              display: block;
+              margin-left: auto;
+              margin-right: auto;
+              text-align: center;
+            }
+            .mt30{
+              margin-top: 30px;
+            }
+            
+          </style>
+        </head>
+        <body>
+          <a href="https://imgbb.com/" class="maginAuto mt30"><img src="https://i.ibb.co/q0kyqkk/logo.png" alt="logo" border="0" /></a>
+          <p class="header maginAuto">Hello! Pathinya Jongupangpan</p>
+          <p class="text18 maginAuto">To activate your account, please click on the link below to verify your email address</p>
+          <a href=${link} target="_blank" class="maginAuto">${link}</a>
+        </body>
+        </html>
+        `, 
+      });
+      return resEmail;
+
+    }catch(error){
+      throw new BadRequestException('sending email fail');
+    }
+  }
   
-  
+  async confirmEmail(hashCode :string, timeStamp :string ){
+    // timeStamp is GMT+7 already
+    type ItypeConfirm = "default" | "success" | "fail";
+    let typeConfirm : ItypeConfirm = "success";
+    const currentTime = new Date();
+    currentTime.setHours(currentTime.getHours() + 7);
+    const timeStampConfirm = new Date(timeStamp);
+    // 1. check hash in db
+    const user = await this.userService.findByHashCode(hashCode)
+
+    // 2. check that time different more 5 minute?
+    if(currentTime.getTime() - timeStampConfirm.getTime() > 1000*60*5 ){
+      typeConfirm = "fail";
+    }
+
+    // 3. Update status isConfirm
+    await this.userService.findHashCodeAndUpdateIsConfirm(hashCode)
+
+    return { "url": this.configService.get<string>("CLIENT_HOST") + "/signin?email=" + user.email + "&typeConfirm=" + typeConfirm }
+  }
 }

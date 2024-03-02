@@ -1,4 +1,4 @@
-import { Get, Patch, Post, Controller, Body, Param, Query, Delete, Session, UseGuards, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Get, Patch, Post, Controller, Body, Param, Query, Delete, Session, UseGuards, NotFoundException, BadRequestException, Request, Redirect } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user-resp.dto';
@@ -14,6 +14,8 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { ThirdPartyGuard } from 'src/guards/third-party.guard';
 import { ObjectId } from 'mongodb';
 import { UserRole } from './user.constant';
+import { SendEmailDto } from './dtos/send-email.dto';
+import { ConfirmEmailDto } from './dtos/confirm-email.dto';
 
 @Controller('auth')
 // @UseGuards(AuthGuard)
@@ -82,6 +84,12 @@ export class UserController {
     return this.userService.findAllUser();
   }
   
+  @Get('/confirmEmail')
+  @Redirect()
+  confirmEmail(@Query() query : {hashCode : string, timeStamp: string}){
+    return this.authService.confirmEmail(query.hashCode, query.timeStamp);
+  }
+
   @Get('/:id')
   async findUser(@Param('id') id: string) { // param is only string, we should parseInt before send to servicethis.userService.findOne(id)
     return this.userService.findOne(id);
@@ -89,6 +97,7 @@ export class UserController {
   
   @Get('')
   findAllUsers(@Query('email') email: string) { // not check 
+    console.log("test")
     return this.userService.find(email);
   }
 
@@ -103,5 +112,10 @@ export class UserController {
     return this.userService.update(id, body);
   }
 
-
+  @Post('/sendEmail')
+  sendEmail(@Body() body : SendEmailDto){
+    return this.authService.sendEmail(body.email);
+  }
+  
+  
 }

@@ -38,5 +38,10 @@ export class User {
   @Column()
   role: UserRole;
   
+  @Column()
+  hashCode : string;
+
+  @Column()
+  isConfirm : boolean
   
 }
