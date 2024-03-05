@@ -230,11 +230,17 @@ export class AuthService {
     // 2. check that time different more 5 minute?
     if(currentTime.getTime() - timeStampConfirm.getTime() > 1000*60*5 ){
       typeConfirm = "fail";
+      return { "url": this.configService.get<string>("CLIENT_HOST") + "/signin?email=" + user.email + "&typeConfirm=" + typeConfirm }
     }
 
     // 3. Update status isConfirm
     await this.userService.findHashCodeAndUpdateIsConfirm(hashCode)
 
-    return { "url": this.configService.get<string>("CLIENT_HOST") + "/signin?email=" + user.email + "&typeConfirm=" + typeConfirm }
+    // 4. check role for specific route
+    if(user.role == "user"){
+      return { "url": this.configService.get<string>("CLIENT_HOST") + "/signin?email=" + user.email + "&typeConfirm=" + typeConfirm }
+    }else{
+      return { "url": this.configService.get<string>("CLIENT_HOST") + "organization/signin?email=" + user.email + "&typeConfirm=" + typeConfirm }
+    }
   }
 }
