@@ -10,6 +10,7 @@ declare global {
   namespace Express { // find Express lib
     interface Request { // add properties in request
       currentUser?: User;
+      currentOrganize?: User;
     }
   }
 }
@@ -23,12 +24,17 @@ export class CurrentUserMiddleware implements NestMiddleware {
   ) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
-    const { userId } = req.session || {};
+    const { userId, organizeId } = req.session || {};
 
     if(userId) {
       const user = await this.userService.findOne(userId);
       req.currentUser = user;
     }
+
+    if(organizeId) {
+      const organize = await this.userService.findOne(organizeId);
+      req.currentOrganize = organize;
+    } 
 
     next();
   }
