@@ -27,6 +27,9 @@ export class User {
   telNo: string;
 
   @Column()
+  landlineNumber : string;
+
+  @Column()
   keyStoreJsonV3: KeyStore;
 
   @Column()
@@ -35,5 +38,10 @@ export class User {
   @Column()
   role: UserRole;
   
+  @Column()
+  hashCode : string;
+
+  @Column()
+  isConfirm : boolean
   
 }

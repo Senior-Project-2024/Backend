@@ -12,7 +12,7 @@ export class UserService {
   constructor(@InjectRepository(User) private userRepo: MongoRepository<User>) {}
   
   create(userDto: CreateUserDto, keyStoreJsonV3: KeyStore) {
-    const user: User = this.userRepo.create({...userDto, keyStoreJsonV3});
+    const user: User = this.userRepo.create({...userDto, isConfirm : false, hashCode : "", keyStoreJsonV3});
     return this.userRepo.save(user);
   }
 
@@ -47,6 +47,10 @@ export class UserService {
     return user;
   }
 
+  async findByLandlineNumber(landlineNumber : string) {
+    return await this.userRepo.find({where : {landlineNumber}})
+  }
+
   async update(id: string, attrs: Partial<User>) {
     // 1. find that by id
     const user = await this.findOne(id); 
@@ -60,6 +64,46 @@ export class UserService {
 
     // 3. save it back to database
     return this.userRepo.save(user);
+  }
+
+  async findByEmailAndUpdateHashCode(email : string, hashCode : string){
+    const [user] = await this.find(email); 
+    
+    if(!user){
+      throw new NotFoundException('user not found!');
+    }
+
+    // update hashCode
+    await this.userRepo.findOneAndUpdate({email} , {$set:{hashCode}});
+
+    return user;
+  }
+
+  async findByHashCode(hashCode : string){
+
+    const [user] = await this.userRepo.find({where : {hashCode}})
+    
+    if(!user){
+      // throw new NotFoundException('hashCode not found!');
+    }
+
+    return user;
+  }
+  
+
+  async findHashCodeAndUpdateIsConfirm(hashCode : string){
+
+    const user = await this.userRepo.find({where : {hashCode}})
+    
+    if(user.length === 0){
+      return "hashCode not found";
+      // throw new NotFoundException('user not found!');
+    }
+
+    // update isConfirm
+    const updated = await this.userRepo.findOneAndUpdate({hashCode} , {$set:{ isConfirm : true}});
+
+    return updated;
   }
 
   async remove (id: string) {
