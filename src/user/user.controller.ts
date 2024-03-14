@@ -16,6 +16,7 @@ import { ObjectId } from 'mongodb';
 import { UserRole } from './user.constant';
 import { SendEmailDto } from './dtos/send-email.dto';
 import { ConfirmEmailDto } from './dtos/confirm-email.dto';
+import { UserSignOutReqDto } from './dtos/user-sign-out.dto';
 
 @Controller('auth')
 // @UseGuards(AuthGuard)
@@ -48,35 +49,45 @@ export class UserController {
   @Serialize(UserSignInRespDto)
   async signIn(@Body() body: UserSignInReqDto, @Session() session: IAppSession): Promise<UserSignInRespDto> {
     const user = await this.authService.signIn(body.email, body.password);
-    session.userId = user.id;
-    session.userWalletPrivateKey = user.ethWallet.privateKey;
+
+    if(user.role === UserRole.user) {
+      session.userId = user.id;
+      session.userWalletPrivateKey = user.ethWallet.privateKey;
+    }
+
+    if(user.role === UserRole.organization) {
+      session.organizeId = user.id;
+    } 
     return user;
   }
 
   @Get('/whoAmI')
-  getCurrentUser(@CurrentUser() user: User, @Session() session: IAppSession) {
-    console.log(session);
-    return user;
+  getCurrentUser(@CurrentUser() user: User, @CurrentUser(UserRole.organization) organize: User) {
+    return { user, organize };
   }
 
   @Post('/signout') 
-  signOut(@Session() session: IAppSession) {
-    session.userId = null;
-    session.userWalletPrivateKey = null;
+  signOut(@Body() body: UserSignOutReqDto, @Session() session: IAppSession) {
+
+    if(body.role === UserRole.user) {
+      session.userId = null;
+      session.userWalletPrivateKey = null;  
+    } 
+
+    if(body.role === UserRole.organization) {
+      session.organizeId = null;  
+    }
+    
   }
 
   @Post('/apiToken')
-  getApiToken(@CurrentUser() user: User)  {
+  getApiToken(@CurrentUser(UserRole.organization) organize: User)  {
 
-    if(!user) {
+    if(!organize) {
       throw new NotFoundException('You are not Logged in.');
     }
 
-    if(user.role !== UserRole.organization ) {
-      throw new BadRequestException('You are not allowed to generate api token.');
-    }
-
-    return this.authService.generateTokenApi(user.id.toString()); // just save it to database 
+    return this.authService.generateTokenApi(organize.id.toString()); // just save it to database 
   }
   
   @Get('/all')

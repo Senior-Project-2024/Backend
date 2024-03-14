@@ -6,4 +6,6 @@ export interface IAppSession {
   userWalletPrivateKey: string;
 
   timeStamp ?: number;
+  
+  organizeId: string;
 }
