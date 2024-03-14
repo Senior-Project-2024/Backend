@@ -13,6 +13,7 @@ import { Crypto } from '../utils/crypto.util';
 import { UserRole } from './user.constant';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
+import { IAppSession } from 'src/utils/interfaces/app-session.interface';
 
 const scrypt = promisify(_scrpyt);
 
@@ -160,9 +161,9 @@ export class AuthService {
     const hashCode = this.crypto.getSHA256(email, "hex");
     const user = await this.userService.findByEmailAndUpdateHashCode(email, hashCode);
     // timeStamp will be string and will be set GMT+7 already
-    const link = this.configService.get<string>("HOST") + "/auth/confirmEmail?hashCode=" + hashCode + "&timeStamp=" + timestamp;
+    const link = this.configService.get<string>("HOST") + "/auth/confirmEmail?hashCode=" + hashCode ;
     try{
-      const resEmail = await transporter.sendMail({
+      await transporter.sendMail({
         from: {name : "ProveSelf" , address : "pathinya19@gmail.com"}, // sender address
         to: [{name : user.fName + " " + user.lName , address : email}], // list of receivers
         subject: "Hello ✔", // Subject line
@@ -210,25 +211,31 @@ export class AuthService {
         </html>
         `, 
       });
-      return resEmail;
+      return timestamp.getTime();
 
     }catch(error){
       throw new BadRequestException('sending email fail');
     }
   }
   
-  async confirmEmail(hashCode :string, timeStamp :string ){
-    // timeStamp is GMT+7 already
+  async confirmEmail(hashCode :string, timeStamp :number ){
     type ItypeConfirm = "default" | "success" | "fail";
     let typeConfirm : ItypeConfirm = "success";
     const currentTime = new Date();
-    currentTime.setHours(currentTime.getHours() + 7);
-    const timeStampConfirm = new Date(timeStamp);
     // 1. check hash in db
-    const user = await this.userService.findByHashCode(hashCode)
+    const user = await this.userService.findByHashCode(hashCode);
 
+    // 1.5 check if confirm email already
+    if(user.isConfirm){
+      if(user.role == "user"){
+        return { "url": this.configService.get<string>("CLIENT_HOST") + "/signin"}
+      }else{
+        return { "url": this.configService.get<string>("CLIENT_HOST") + "organization/signin"}
+      }
+    }
+    
     // 2. check that time different more 5 minute?
-    if(currentTime.getTime() - timeStampConfirm.getTime() > 1000*60*5 ){
+    if(currentTime.getTime() - timeStamp > 1000*60*5 ){
       typeConfirm = "fail";
       return { "url": this.configService.get<string>("CLIENT_HOST") + "/signin?email=" + user.email + "&typeConfirm=" + typeConfirm }
     }

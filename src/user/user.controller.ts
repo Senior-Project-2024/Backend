@@ -86,8 +86,8 @@ export class UserController {
   
   @Get('/confirmEmail')
   @Redirect()
-  confirmEmail(@Query() query : {hashCode : string, timeStamp: string}){
-    return this.authService.confirmEmail(query.hashCode, query.timeStamp);
+  confirmEmail(@Query() query : {hashCode : string}, @Session() session : IAppSession){
+    return this.authService.confirmEmail(query.hashCode, session.timeStamp);
   }
 
   @Get('/:id')
@@ -113,8 +113,9 @@ export class UserController {
   }
 
   @Post('/sendEmail')
-  sendEmail(@Body() body : SendEmailDto){
-    return this.authService.sendEmail(body.email);
+  async sendEmail(@Body() body : SendEmailDto, @Session() session : IAppSession ){
+    const timeStamp = await this.authService.sendEmail(body.email);
+    session.timeStamp = timeStamp;
   }
   
   
