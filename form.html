@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html charset=UTF-8" /> -->
+    <title>Document</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Pridi:wght@300;400;500;700&family=Rubik:wght@300;400;500;600;700&family=Signika:wght@300..700&display=swap');
+      *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Rubik', sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        color: #292929;
+      }
+      body{
+        background-color: #FCFAFF;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;  
+      }
+      .flex{
+        display: flex;
+        flex-direction: row;
+      }
+      .flex-col{
+        flex-direction: column;
+      }
+      .justify-center{
+        justify-content: center;
+      }
+      .items-center{
+        align-items: center;  
+      }
+      .box{
+        background: #FFFFFF;
+        border-radius: 20px;
+        padding: 150px 200px;
+        gap: 46px;
+      }
+      .welcome{
+        font-size: 20px;
+        font-weight: 300;
+        color: #878787;
+      }
+      .proveSelf{
+        font-family: "Signika", sans-serif;
+        font-size: 25px;
+        color: #8B5FBF;
+      }
+      .signin{
+        font-size: 64px;
+        font-weight: 500;
+        color: #61398F;
+      }
+      .input{
+        width: 476px;
+        padding: 11px 25px;
+        background: #E9E4ED;
+        border-radius: 4px;
+        border-width: 0px;
+        
+        font-size: 16px;
+        font-weight: 300;
+      }
+      .input:focus {
+        outline: 1px solid #61398F;
+      }
+      .text18{
+        font-size: 18px;
+      }
+      .grey-100{
+        color: #878787;
+      }
+      .text14{
+        font-size: 14px;
+      }
+      .forgotPassword{
+        color : #9A73B5;
+        font-weight: 300;
+        cursor: pointer;
+        align-self:end;
+        text-decoration-line: none;
+      }
+      .button{
+        background: #8B5FBF;
+        border-radius: 22px;
+        border-width: 0;
+        padding: 12px 25px;
+      }
+      .text-button{
+        font-size: 18px;
+        font-weight: 500;
+        color: #FFFFFF;
+      }
+      .text-no-account{
+        font-weight: 300;
+        color:#292929;
+      }
+      
+    </style>
+  </head>
+  <body>
+
+  <form class="flex flex-col items-center box" method="post">
+    <div class="flex flex-col" style="gap: 16px; align-self: start;">
+      <p class="welcome">Welcome to <span class="proveSelf">ProveSelf</span></p>
+      <p class="signin">Sign in</p>
+      <p class="" style="font-weight: 300; font-size: 20px;">Sign in for issue Badge or Certificate</p>
+    </div>
+    <div class="flex flex-col" style="gap: 20px;">
+      <div class="flex flex-col" style="gap : 10px;">
+        <p class="text18">Email address</p>
+        <input id="email" type="text" class="input" placeholder="Example@gmail.com" autofocus>
+      </div>
+      <div class="flex flex-col" style="gap : 10px;">
+        <p class="text18">Password</p>
+        <input id="passsword" type="password" class="input" placeholder="*********">
+        <a href="http://localhost:8080/" target="_blank" class="forgotPassword">Forgot Password?</a>
+      </div>
+    </div>
+    <div class="flex flex-col" style="gap : 15px ">
+      <div class="flex justify-center" style="width: 100%;">
+        <button type="submit" class="button flex items-center" style="gap : 12px">
+          <p class="text-button">SIGN IN</p>
+          <svg width="20" height="9" viewBox="0 0 18 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0.687243 5.40625H14.8716L11.4896 1.11719C11.3935 0.995313 11.4802 0.8125 11.6372 0.8125H13.156C13.3857 0.8125 13.6037 0.917969 13.7443 1.09844L17.588 5.97344C17.9747 6.46563 17.6255 7.1875 16.9997 7.1875H0.687243C0.584118 7.1875 0.499743 7.10313 0.499743 7V5.59375C0.499743 5.49062 0.584118 5.40625 0.687243 5.40625Z" fill="white"/>
+          </svg>
+        </button>
+      </div>
+      <p class="text-no-account">I don't have an account ? <a href="http://localhost:8080/signup" target="_blank" style="color:#8B5FBF;">Sign up</a></p>
+    </div>
+  </form>
+  </body>
+</html>
