@@ -10,7 +10,7 @@ enum EncodedParams {
 type EncodedType = 'hex' | 'base64';
 
 @Injectable()
-export class Crypto { 
+export class CryptoUtil { 
 
   constructor(private configService: ConfigService) {}
 
@@ -41,7 +41,7 @@ export class Crypto {
     console.log('iv' + iv.toString('base64').length)
     console.log('encrypted' + encrypted.toString('base64').length)
 
-    return Buffer.concat([iv, tag, encrypted]).toString('base64');
+    return Buffer.concat([iv, tag, encrypted]).toString('hex');
   }
 
   decryptAES256(cipher: string, keyName: string, mode: string): string {
@@ -49,7 +49,7 @@ export class Crypto {
     // check config value
     this.checkConfigureValue(keyName, mode);
 
-    const buffer: Buffer = Buffer.from(cipher, 'base64');
+    const buffer: Buffer = Buffer.from(cipher, 'hex');
 
     const iv: Buffer = buffer.subarray(0, 12);
     const tag: Buffer = buffer.subarray(12, 28);

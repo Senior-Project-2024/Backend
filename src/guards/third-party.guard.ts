@@ -15,6 +15,12 @@ export class ThirdPartyGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
 
-    return request.body.tokenApi && this.authService.verifyTokenApi(request.body.tokenApi);
+    console.log(request.query.tokenApi)
+    console.log(request.query.templateCode)
+    if(!request.query.tokenApi) {
+      return false;
+    }
+
+    return request.query.tokenApi && this.authService.verifyTokenApi(request.query.tokenApi);
   }
 }

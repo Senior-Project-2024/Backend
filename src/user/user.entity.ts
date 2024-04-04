@@ -1,4 +1,4 @@
-import { Entity, Column, ObjectIdColumn, ObjectId } from "typeorm";
+import { Entity, Column, ObjectIdColumn } from "typeorm";
 import { KeyStore } from "web3";
 import { UserRole } from "./user.constant";
 

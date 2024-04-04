@@ -1,4 +1,4 @@
-import { Get, Patch, Post, Controller, Body, Param, Query, Delete, Session, UseGuards, NotFoundException, BadRequestException, Request, Redirect } from '@nestjs/common';
+import { Get, Patch, Post, Controller, Body, Param, Query, Delete, Session, UseGuards, NotFoundException, BadRequestException, Request, Redirect, Headers, Res, HttpStatus } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user-resp.dto';
@@ -17,6 +17,7 @@ import { UserRole } from './user.constant';
 import { SendEmailDto } from './dtos/send-email.dto';
 import { ConfirmEmailDto } from './dtos/confirm-email.dto';
 import { UserSignOutReqDto } from './dtos/user-sign-out.dto';
+import { Response } from 'express'
 
 @Controller('auth')
 // @UseGuards(AuthGuard)
@@ -26,6 +27,26 @@ export class UserController {
     private userService: UserService,
     private authService: AuthService,
     ) {}
+
+  @Post('/headers')
+  async testHeaders(@Headers() headers: any) {
+    console.log(headers);
+  }
+
+  @Post('/thirdParty')
+  async thirdPartyAuthentication(@Headers() headers: any) {
+    console.log(headers);
+  }
+
+  @Get('thirdParty')
+  async thirdPartyAuthenticationForm(@CurrentUser() user: User, @Res() res: Response) {
+    
+    if(!user) {
+      return res.status(HttpStatus.FORBIDDEN).send(this.authService.loginForm());
+    }
+
+  }
+
 
   @Post('/signup')
   @Serialize(UserResponseDto)
@@ -62,7 +83,7 @@ export class UserController {
   }
 
   @Get('/whoAmI')
-  getCurrentUser(@CurrentUser() user: User, @CurrentUser(UserRole.organization) organize: User) {
+  getCurrentUser(@CurrentUser() user: User, @CurrentUser(UserRole.organization,) organize: User) {
     return { user, organize };
   }
 
@@ -108,7 +129,6 @@ export class UserController {
   
   @Get('')
   findAllUsers(@Query('email') email: string) { // not check 
-    console.log("test")
     return this.userService.find(email);
   }
 

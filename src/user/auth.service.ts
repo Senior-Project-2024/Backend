@@ -9,7 +9,7 @@ import { CreateTokenApiRespDto } from './dtos/create-token-api-resp.dto';
 import { Web3App } from 'src/utils/web3.util';
 import { Web3Account } from 'web3-eth-accounts';
 import { KeyStore } from 'web3';
-import { Crypto } from '../utils/crypto.util';
+import { CryptoUtil } from '../utils/crypto.util';
 import { UserRole } from './user.constant';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
@@ -22,7 +22,7 @@ export class AuthService {
   
   constructor(
     private userService: UserService,
-    private crypto: Crypto,
+    private crypto: CryptoUtil,
     private readonly configService: ConfigService
     ) {}
   
@@ -79,7 +79,6 @@ export class AuthService {
   async signIn(email: string, password: string): Promise<UserSignInRespDto> {
     //1. find user is exist in db ?
     const [user] = await this.userService.find(email);
-    console.log(user)
 
     if(!user) {
       throw new NotFoundException('user not found!.');
@@ -110,8 +109,6 @@ export class AuthService {
   }
 
   async generateTokenApi(id: string): Promise<CreateTokenApiRespDto> {
-
-    console.log(id.toString().length)
     
     // encrypt userId with TOKEN_API_KEY
     const tokenApi: string = this.crypto.encryptAES256( id.toString(), 'TOKEN_API_KEY', 'AES256_GCM');
@@ -250,4 +247,20 @@ export class AuthService {
       return { "url": this.configService.get<string>("CLIENT_HOST") + "organization/signin?email=" + user.email + "&typeConfirm=" + typeConfirm }
     }
   }
+
+  loginForm() {
+    return `
+    <form method="POST">
+      <div>
+        <label>Email</label>
+        <input name="email" />
+      </div>
+      <div>
+        <label>Password</label>
+        <input name="password" type="password"/> 
+      </div>
+      <button>submit</button>
+    </form>`
+  }
+
 }

@@ -28,7 +28,6 @@ export class UserService {
     } catch (error) {
       throw new BadRequestException('userId is not found');      
     }
-
   }
 
   async findAllUser(){

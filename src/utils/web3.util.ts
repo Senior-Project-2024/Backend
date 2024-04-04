@@ -1,5 +1,7 @@
 import { RegisteredSubscription } from 'web3/lib/commonjs/eth.exports';
-import { Web3 } from 'web3';
+import { Web3, Web3BaseWalletAccount } from 'web3';
+import { ConfigService } from '@nestjs/config';
+import { Wallet, Web3Account } from 'web3-eth-accounts';
 
 export class Web3App {
 
@@ -12,6 +14,31 @@ export class Web3App {
     }
 
     return Web3App.instance;
+  }
+
+  static addWalletForSignTransaction(privateKey: string): Web3BaseWalletAccount{
+
+    // get server wallet private key for signing transaction
+    const privateKeyWithPrefix = privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`
+    const web3Account = Web3App.getInstance().eth.accounts.privateKeyToAccount(privateKeyWithPrefix);
+
+    const account: Wallet<Web3BaseWalletAccount> = Web3App.getInstance().eth.accounts.wallet.add(web3Account);
+    
+    return account[0];
+  }
+
+  static removeWalletForSignTransaction(address: string) : Boolean{
+
+    // get server wallet private key for signing transaction
+    const addressWithPrefix = address.startsWith('0x') ? address : `0x${address}`
+
+    return Web3App.getInstance().eth.accounts.wallet.remove(addressWithPrefix);
+  }
+
+  static getAccountFromPrivateKey(privateKey: string): Web3Account {
+    const privateKeyWithPrefix = privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`
+
+    return Web3App.getInstance().eth.accounts.privateKeyToAccount(privateKeyWithPrefix);
   }
   
 }

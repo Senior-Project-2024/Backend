@@ -6,6 +6,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { User } from './user/user.entity';
+import { BadgesModule } from './badges/badges.module';
+import { CertificatesModule } from './certificates/certificates.module';
+import { Badge } from './badges/badges.entity';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -22,11 +26,14 @@ const cookieSession = require('cookie-session');
           url: config.get<string>('DB_URI'),
           database: config.get<string>('DB_NAME'),
           synchronize: true,
-          entities: [User],
+          entities: [User, Badge],
         };
       }
     }),
     UserModule,
+    BadgesModule,
+    CertificatesModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [
@@ -43,7 +50,8 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(
       cookieSession({
-        keys: ['asdasdasd']
+        keys: ['asdasdasd'],
+        sameSite: 'lax'
       })
     )
     .forRoutes('*');

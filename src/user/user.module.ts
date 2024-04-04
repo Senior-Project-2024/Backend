@@ -4,7 +4,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { User } from './user.entity';
 import { AuthService } from './auth.service'; 
-import { Crypto } from 'src/utils/crypto.util';
+import { CryptoUtil } from 'src/utils/crypto.util';
 import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
 
 @Module({
@@ -13,8 +13,13 @@ import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
   providers: [
     UserService,
     AuthService,
-    Crypto
+    CryptoUtil
   ],
+  exports: [
+    UserService,
+    AuthService,
+    CryptoUtil
+  ]
 })
 export class UserModule {
   configure(consumer: MiddlewareConsumer) {

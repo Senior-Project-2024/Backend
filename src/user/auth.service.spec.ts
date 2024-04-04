@@ -3,6 +3,9 @@ import { UserService } from './user.service';
 import { AuthService } from './auth.service';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { User } from './user.entity';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { KeyStore } from 'web3';
+import { ObjectId } from 'mongodb';
 
 describe('AuthService', () => {
 
@@ -12,15 +15,15 @@ describe('AuthService', () => {
 
   beforeEach(async () => {
     
-    let users: User[] = [];
+    // let users: User[] = [];
 
     fakeService = {
       find: (email: string) => {
         const user = users.filter((user) => user.email === email);
         return Promise.resolve(user); 
       },
-      create: (email: string, password: string) => {
-        const newUser = { id: Math.floor(Math.random() * 99999), email, password};
+      create: (userDto: CreateUserDto, keyStoreJsonV3: KeyStore) => {
+        const newUser = { id: new ObjectId('dasdasdasdasd'), ...userDto, isConfirm: false, hashCode : "", keyStoreJsonV3};
         users.push(newUser);
         return Promise.resolve(newUser);
       }
