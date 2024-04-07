@@ -1,4 +1,4 @@
-import { Get, Patch, Post, Controller, Body, Param, Query, Delete, Session, UseGuards, NotFoundException, BadRequestException, Request, Redirect, Headers, Res, HttpStatus } from '@nestjs/common';
+import { Get, Patch, Post, Controller, Body, Param, Query, Delete, Session, UseGuards, NotFoundException, BadRequestException, Request, Redirect, Headers, Res, HttpStatus, ForbiddenException } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user-resp.dto';
@@ -33,9 +33,19 @@ export class UserController {
     console.log(headers);
   }
 
-  @Post('/thirdParty')
-  async thirdPartyAuthentication(@Headers() headers: any) {
-    console.log(headers);
+  @Post('thirdParty')
+  @Redirect('https://www.google.com')
+  async thirdPartyAuthentication(
+    @Body() body: UserSignInReqDto, 
+    @Query('email') redirectURL: string) {
+
+    const user = await this.authService.signIn(body.email, body.password);
+
+    if(user.role === UserRole.user) {
+      return { url: redirectURL };
+    } 
+
+    throw new ForbiddenException('user not login!.');
   }
 
   @Get('thirdParty')
