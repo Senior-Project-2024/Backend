@@ -18,16 +18,13 @@ export class UserService {
 
   async findOne(id: string): Promise<User> {
 
-    if(!id) {
+    if(!id || id.length === 0) {
       return null;
     }
-
-    try {
-      const user: User = await this.userRepo.findOneBy( { _id: new ObjectId(id) });
-      return user;
-    } catch (error) {
-      throw new BadRequestException('userId is not found');      
-    }
+    console.log(id)
+    const user: User | null = await this.userRepo.findOneBy( { _id: new ObjectId(id) });
+    
+    return user;
   }
 
   async findAllUser(){
