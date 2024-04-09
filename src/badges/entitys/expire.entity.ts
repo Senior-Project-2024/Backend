@@ -5,16 +5,18 @@ export class ExpireObject {
 
   @IsNumber()
   @IsNotEmpty()
-  @Transform(({ type }) => Number(type))
+  @Transform(({ value }) => Number(value))
   year: number;
 
   @IsNumber()
   @IsNotEmpty()
-  @Transform(({ type }) => Number(type))
+  @Transform(({ value }) => Number(value))
   month: number;
 
   @IsNumber()
   @IsNotEmpty()
-  @Transform(({ type }) => Number(type))
+  @Transform(({ value }) => Number(value))
   day: number;
+
+
 }
