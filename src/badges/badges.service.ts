@@ -32,7 +32,6 @@ export class BadgesService {
       mimeType: uploadedImage.format,
       originalFilename: uploadedImage.original_filename,
     };
-
     const badgeTemplate: Badge = this.badgeRepo.create({
       ...badgeTemplateDto,
       imageInfo,

@@ -17,6 +17,9 @@ export class CreateBadgeTemplateDto {
   templateCode: string;
 
   @IsString()
+  linkCourse: string
+
+  @IsString()
   organizeName: string;
   
   @IsArray()

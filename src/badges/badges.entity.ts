@@ -21,6 +21,9 @@ export class Badge {
   templateCode: string;
 
   @Column()
+  linkCourse: string
+
+  @Column()
   organizeName: string;
 
   @Column()
