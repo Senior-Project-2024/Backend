@@ -63,7 +63,6 @@ export class BadgesController {
     @UploadedFile() image: Express.Multer.File
      ) {
 
-    console.log(body.expiration)
     try {
       await this.badgeService.createTemplate(body, organize.id, image);
       return this.badgeService.findAll();
