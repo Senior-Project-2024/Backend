@@ -7,5 +7,5 @@ export class BadgeImageObject {
 
   mimeType: string;
 
-  originalFilename: number;
+  originalFilename: string;
 }

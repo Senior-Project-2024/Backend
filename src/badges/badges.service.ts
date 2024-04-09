@@ -30,7 +30,7 @@ export class BadgesService {
     const imageInfo: BadgeImageObject = {
       imageURL: uploadedImage.secure_url,
       mimeType: uploadedImage.format,
-      originalFilename: uploadedImage.original_filename,
+      originalFilename: image.originalname,
     };
     const badgeTemplate: Badge = this.badgeRepo.create({
       ...badgeTemplateDto,
@@ -100,68 +100,68 @@ export class BadgesService {
     return imageResponse.data;
   }
 
-  // async mintBadge(userPrivateKey: string, templateCode: string, evidenceURL: string) {
+  async mintBadge(userPrivateKey: string, templateCode: string, evidenceURL: string) {
 
-  //   /* call dependencies for minting user badge to our smart contracts */
-  //   /* 1. our app wallet (server wallet)  */
-  //   /* 2. smart contract */
-  //   const serverWallet: Web3BaseWalletAccount = this.blockchainService.addServerWalletForSignTransaction();
-  //   const contract: Contract<ContractABI>  = this.blockchainService.getSmartContract();
+    /* call dependencies for minting user badge to our smart contracts */
+    /* 1. our app wallet (server wallet)  */
+    /* 2. smart contract */
+    const serverWallet: Web3BaseWalletAccount = this.blockchainService.addServerWalletForSignTransaction();
+    const contract: Contract<ContractABI>  = this.blockchainService.getSmartContract();
 
-  //   /* prepare user data for minting */
-  //   /* 1. userWallet */
-  //   /* 2. query badge template for create instance of badge */
-  //   const userWallet: Web3BaseWalletAccount = this.blockchainService.getWalletByPrivateKey(userPrivateKey);
+    /* prepare user data for minting */
+    /* 1. userWallet */
+    /* 2. query badge template for create instance of badge */
+    const userWallet: Web3BaseWalletAccount = this.blockchainService.getWalletByPrivateKey(userPrivateKey);
 
-  //   const badgeTemplate: Badge = await this.findByTemplateCode(templateCode);
+    const badgeTemplate: Badge = await this.findByTemplateCode(templateCode);
 
-  //   const startDate: Date = new Date();
-  //   const expireDate: Date = DateUtil.addCurrentDateWithYMD
-  //   (
-  //     badgeTemplate.expiration.year,
-  //     badgeTemplate.expiration.month,
-  //     badgeTemplate.expiration.day
-  //   );
+    const startDate: Date = new Date();
+    const expireDate: Date = DateUtil.addCurrentDateWithYMD
+    (
+      badgeTemplate.expiration.year,
+      badgeTemplate.expiration.month,
+      badgeTemplate.expiration.day
+    );
 
-  //   /* create user badge for minting and store it on our smart contracts  */
-  //   const userBadge = { 
-  //     issuedBy: badgeTemplate.name,
-  //     date: startDate.toISOString().split('T')[0],
-  //     expire: expireDate.toISOString().split('T')[0],
-  //     templateCode: templateCode,
-  //     evidenceURL
-  //   };
+    /* create user badge for minting and store it on our smart contracts  */
+    const userBadge = { 
+      issuedBy: badgeTemplate.name,
+      date: startDate.toISOString().split('T')[0],
+      expire: expireDate.toISOString().split('T')[0],
+      templateCode: templateCode,
+      evidenceURL
+    };
 
-  //   /* create metadata of badge */
-  //   const imageBlob: ArrayBuffer | null = await this.getBadgeBlobFromImageURL(badgeTemplate.imageInfo.imageURL);
+    /* create metadata of badge */
+    const imageBlob: ArrayBuffer | null = await this.getBadgeBlobFromImageURL(badgeTemplate.imageInfo.imageURL);
 
-  //   if(!imageBlob) {
-  //     throw new NotFoundException('Not Found Image Blob of Badge Image.');
-  //   }
+    if(!imageBlob) {
+      throw new NotFoundException('Not Found Image Blob of Badge Image.');
+    }
 
-  //   const metadata = await this.nftStorageClientUtils.uploadNFTMetaData(badgeTemplate, imageBlob);
+    const metadata = await this.nftStorageClientUtils.uploadNFTMetaData(badgeTemplate, imageBlob);
 
-  //   if(!metadata) {
-  //     throw new BadRequestException('Can not upload metadata of nft');
-  //   }
+    if(!metadata) {
+      throw new BadRequestException('Can not upload metadata of nft');
+    }
 
-  //   try {
-  //     await contract.methods.safeMintBadge(
-  //       userWallet.address,
-  //       userBadge,
-  //       metadata.url
-  //     ).send({
-  //       from: serverWallet.address,
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //     throw new BadRequestException(error.innerError.message);
-  //   }
+    try {
+      await contract.methods.safeMintBadge(
+        userWallet.address,
+        userBadge,
+        metadata.url
+      ).send({
+        from: serverWallet.address,
+      });
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException(error.innerError.message);
+    }
 
-  //   /* remove server account from wallet of provider */
-  //   this.blockchainService.removeServerWalletForSignTransaction();
+    /* remove server account from wallet of provider */
+    this.blockchainService.removeServerWalletForSignTransaction();
   
-  // }
+  }
 
 }
 
