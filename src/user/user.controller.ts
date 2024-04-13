@@ -148,7 +148,7 @@ export class UserController {
   
   @Get('')
   findAllUsers(@Query('email') email: string) { // not check 
-    return this.userService.find(email);
+    return this.userService.find(email); 
   }
 
 

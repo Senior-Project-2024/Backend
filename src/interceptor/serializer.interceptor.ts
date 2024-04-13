@@ -1,12 +1,12 @@
 import {
-  UseInterceptors,
-  NestInterceptor,
+  CallHandler,
   ExecutionContext,
-  CallHandler
+  NestInterceptor,
+  UseInterceptors
 } from '@nestjs/common';
+import { plainToClass } from 'class-transformer';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { plainToClass } from 'class-transformer';
 
 
 interface ClassConstructor {

@@ -1,4 +1,4 @@
-import { Expose, Type } from "class-transformer";
+import { Expose, Transform, Type } from "class-transformer";
 import { KeyStore } from "web3";
 import { EthWallet } from "../entitys/eth-wallet.entity";
 import { UserRole } from "../user.constant";
@@ -6,6 +6,7 @@ import { UserRole } from "../user.constant";
 export class UserSignInRespDto{ 
 
   @Expose()
+  @Type(() => String)
   id: string;
 
   @Expose()

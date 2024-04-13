@@ -1,10 +1,10 @@
 import {
-  NestMiddleware,
-  Injectable
-} from '@nestjs/common'
-import { Request, Response, NextFunction } from 'express';
-import { UserService } from '../user.service';
+  Injectable,
+  NestMiddleware
+} from '@nestjs/common';
+import { NextFunction, Request, Response } from 'express';
 import { User } from '../user.entity';
+import { UserService } from '../user.service';
 
 declare global {
   namespace Express { // find Express lib
