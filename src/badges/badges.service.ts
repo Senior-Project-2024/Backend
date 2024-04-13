@@ -41,6 +41,27 @@ export class BadgesService {
     return this.badgeRepo.save(badgeTemplate);
   }
 
+  async updateTemplete(badgeTemplateDto: CreateBadgeTemplateDto, organizationId: string, image: Express.Multer.File | undefined, badgeId : string){
+    if(image){
+      const uploadedImage: CloudinaryResponse = await this.cloudinaryService.uploadImage(image);
+      const imageInfo: BadgeImageObject = {
+        imageURL: uploadedImage.secure_url,
+        mimeType: uploadedImage.format,
+        originalFilename: image.originalname,
+      };
+      await this.update(badgeId,{
+        ...badgeTemplateDto,
+        imageInfo,
+        userId: organizationId
+      })
+    }else{
+      await this.update(badgeId,{
+        ...badgeTemplateDto,
+        userId: organizationId
+      })
+    }
+  }
+
   async findOne(id: string): Promise<Badge> {
 
     if(!id) {

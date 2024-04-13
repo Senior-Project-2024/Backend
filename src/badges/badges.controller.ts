@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Post, UseGuards, Get, Query, UseInterceptors, UploadedFile, Session } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Post, UseGuards, Get, Query, UseInterceptors, UploadedFile, Session, Param, Patch } from '@nestjs/common';
 import { CreateBadgeTemplateDto } from './dtos/create-badge-template.dto';
 import { ThirdPartyGuard } from 'src/guards/third-party.guard';
 import { CurrentUser } from 'src/user/decorators/current-user.decorator';
@@ -73,9 +73,33 @@ export class BadgesController {
 
   }
 
+  @Patch('/:id') 
+  @UseGuards(OrganizeGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  async updateBadgeTemplete(
+    @Body() body: CreateBadgeTemplateDto, 
+    @CurrentUser(UserRole.organization) organize: User,
+    @UploadedFile() image: Express.Multer.File,
+    @Param('id') id : string
+    ) {
+      try {
+        await this.badgeService.updateTemplete(body, organize.id, image, id);
+        return this.badgeService.findAll();
+      }
+      catch(err) {
+        throw new BadRequestException(`Can not create badge template: ${err}`);
+      }
+  
+    }
+
   @Get('all')
   async getAllBadges(){
     return this.badgeService.findAll();
+  }
+
+  @Get('/:id')
+  async getBadgeById(@Param('id') id: string){
+    return this.badgeService.findOne(id)
   }
 
   // @Get('blob')
