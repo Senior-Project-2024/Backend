@@ -1,4 +1,5 @@
-import { Get, Patch, Post, Controller, Body, Param, Query, Delete, Session, UseGuards, NotFoundException, BadRequestException, Request, Redirect, Headers, Res, HttpStatus, ForbiddenException } from '@nestjs/common';
+import { KeyStore } from 'web3';
+import { Get, Patch, Post, Controller, Body, Param, Query, Delete, Session, UseGuards, NotFoundException, BadRequestException, Request, Redirect, Headers, Res, HttpStatus, ForbiddenException, Render } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user-resp.dto';
@@ -18,6 +19,8 @@ import { SendEmailDto } from './dtos/send-email.dto';
 import { ConfirmEmailDto } from './dtos/confirm-email.dto';
 import { UserSignOutReqDto } from './dtos/user-sign-out.dto';
 import { Response } from 'express'
+import { UserSessionDto } from './dtos/user-session.dto';
+import { BlockChainService } from 'src/blockchian.service';
 
 @Controller('auth')
 // @UseGuards(AuthGuard)
@@ -26,6 +29,7 @@ export class UserController {
   constructor(
     private userService: UserService,
     private authService: AuthService,
+    private blockchainService: BlockChainService
     ) {}
 
   @Post('/headers')
@@ -34,10 +38,10 @@ export class UserController {
   }
 
   @Post('thirdParty')
-  @Redirect('https://www.google.com')
+  @Redirect('')
   async thirdPartyAuthentication(
     @Body() body: UserSignInReqDto, 
-    @Query('email') redirectURL: string) {
+    @Query('redirectURL') redirectURL: string) {
 
     const user = await this.authService.signIn(body.email, body.password);
 
@@ -49,10 +53,14 @@ export class UserController {
   }
 
   @Get('thirdParty')
-  async thirdPartyAuthenticationForm(@CurrentUser() user: User, @Res() res: Response) {
+  @Render('form')
+  async thirdPartyAuthenticationForm(
+    @CurrentUser() user: User, 
+    @Res() res: Response, 
+    @Query('redirectURL') redirectURL: string) {
     
     if(!user) {
-      return res.status(HttpStatus.FORBIDDEN).send(this.authService.loginForm());
+      return { redirectURL };
     }
 
   }
@@ -93,6 +101,7 @@ export class UserController {
   }
 
   @Get('/whoAmI')
+  @Serialize(UserSessionDto)
   getCurrentUser(@CurrentUser() user: User, @CurrentUser(UserRole.organization,) organize: User) {
     return { user, organize };
   }
@@ -149,7 +158,34 @@ export class UserController {
   }
 
   @Patch('/:id')
-  updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) { // not check
+  async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) { // not check
+
+    // if user want to change password
+    if(body.password && body.newPassword) { 
+      //1. check old password from request match password in db ?
+      const user = await this.userService.findOne(id);
+      
+      if(!user) {
+        throw new NotFoundException('user not found!');
+      }
+      
+      await this.authService.checkPasswordMatch(body.password, user.password);
+
+      //2. create hash of a new password
+      const newHashPassword: string = await this.authService.hashPassword(body.newPassword);
+
+      //3. change password encrypted wallet
+      const keyStoreJsonV3: KeyStore = await this.blockchainService.changePasswordEncryptedWallet(
+        body.password,
+        body.newPassword,
+        user.keyStoreJsonV3
+      );
+
+      //4. update value in body for update
+      body.password = newHashPassword;
+      body.keyStoreJsonV3 = keyStoreJsonV3;
+    }
+
     return this.userService.update(id, body);
   }
 

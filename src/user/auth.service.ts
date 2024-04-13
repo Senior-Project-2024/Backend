@@ -49,12 +49,7 @@ export class AuthService {
     }
 
     //2. hash password
-    // generate salt
-    const salt = randomBytes(8).toString('hex');
-    // hash password
-    const hashPassword = (await scrypt(userDto.password, salt, 32)) as Buffer;
-
-    const hashAndSalt = salt + '.' + hashPassword.toString('hex');
+    const hashAndSalt: string = await this.hashPassword(userDto.password);
 
     //3. create eth wallet for new user
     const web3 = Web3App.getInstance();
@@ -77,34 +72,26 @@ export class AuthService {
   }
   
   async signIn(email: string, password: string): Promise<UserSignInRespDto> {
-    //1. find user is exist in db ?
+    // find user is exist in db ?
     const [user] = await this.userService.find(email);
 
     if(!user) {
       throw new NotFoundException('user not found!.');
     }
 
-    // 1.5 check Confirmation email
+    // check Confirmation email
     if(!user.isConfirm) {
       throw new BadRequestException('Your email is not verified');
     }
 
-    //2. get salt from db
-    const [salt, hashPassword] = user.password.split('.');
+    // check password match ? 
+    await this.checkPasswordMatch(password, user.password);
 
-    //3. use salt in db for generate hashPassword that use password in request
-    const hashPasswordFromRequest = (await scrypt(password, salt, 32)) as Buffer;
-
-    //4. compare hasPasswordFromRequest and hashPasswordFromDatabase
-    if(hashPasswordFromRequest.toString('hex') !== hashPassword) {
-      throw new BadRequestException('bad password');
-    }
-
-    //5. decrypt eth wallet
+    // decrypt eth wallet
     const web = Web3App.getInstance();
     const ethWallet: Web3Account = await web.eth.accounts.decrypt(JSON.stringify(user.keyStoreJsonV3), password);
 
-    //6. return result 
+    // return result 
     return { ...user, id: user.id.toString() , ethWallet};
   }
 
@@ -248,9 +235,9 @@ export class AuthService {
     }
   }
 
-  loginForm() {
+  loginForm(redirectURL: string) {
     return `
-    <form method="POST">
+    <form action="./thirdParty?redirectURL=${redirectURL}" method="POST">
       <div>
         <label>Email</label>
         <input name="email" />
@@ -261,6 +248,31 @@ export class AuthService {
       </div>
       <button>submit</button>
     </form>`
+  }
+
+  async checkPasswordMatch(passwordFromRequest: string, passwordFromDb: string) {
+
+    // get salt from db 
+    const [salt, hashPassword] = passwordFromDb.split('.');
+
+    // use salt in db for generate hashPassword that use password in request
+    const hashPasswordFromRequest = (await scrypt(passwordFromRequest, salt, 32)) as Buffer;
+
+    // compare hasPasswordFromRequest and hashPasswordFromDatabase
+    if(hashPasswordFromRequest.toString('hex') !== hashPassword) {
+      throw new BadRequestException('bad password');
+    }
+
+  }
+
+  async hashPassword(passwordToHashed: string): Promise<string> {
+    /* hash password */
+    // generate salt
+    const salt = randomBytes(8).toString('hex');
+    // hash password
+    const hashPassword = (await scrypt(passwordToHashed, salt, 32)) as Buffer;
+
+    return salt + '.' + hashPassword.toString('hex');
   }
 
 }

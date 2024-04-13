@@ -1,10 +1,11 @@
+import { Injectable } from "@nestjs/common";
 import { 
   ValidatorConstraint, 
   ValidatorConstraintInterface, 
   ValidationArguments
 } from "class-validator";
 
-
+@Injectable()
 @ValidatorConstraint({ name: 'isThaiLandlineNumber', async: false })
 export class IsThaiLandlineNumber implements ValidatorConstraintInterface {
 

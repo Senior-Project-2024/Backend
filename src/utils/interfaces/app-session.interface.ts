@@ -1,11 +1,11 @@
 
 export interface IAppSession {
   
-  userId: string;
+  userId?: string;
   
-  userWalletPrivateKey: string;
+  userWalletPrivateKey?: string;
 
   timeStamp ?: number;
   
-  organizeId: string;
+  organizeId?: string;
 }

@@ -13,6 +13,7 @@ export class UserSignInRespDto{
 
   password: string;
 
+  @Expose()
   organizeName: string;
 
   @Expose()
@@ -26,7 +27,11 @@ export class UserSignInRespDto{
 
   keyStoreJsonV3: KeyStore;
 
+  @Expose()
   tokenApi: string;
+
+  @Expose()
+  landlineNumber : string;
 
   @Expose()
   role: UserRole;

@@ -1,5 +1,5 @@
 import { RegisteredSubscription } from 'web3/lib/commonjs/eth.exports';
-import { Web3, Web3BaseWalletAccount } from 'web3';
+import { Web3, Web3BaseWalletAccount, Web3Validator, KeyStore } from 'web3';
 import { ConfigService } from '@nestjs/config';
 import { Wallet, Web3Account } from 'web3-eth-accounts';
 
@@ -40,5 +40,11 @@ export class Web3App {
 
     return Web3App.getInstance().eth.accounts.privateKeyToAccount(privateKeyWithPrefix);
   }
+
+  static async changePasswordToEncryptedWallet(oldPassword: string, newPassword: string, keyStoreJsonV3: KeyStore): Promise<KeyStore> {
+    const wallet = await Web3App.getInstance().eth.accounts.decrypt(JSON.stringify(keyStoreJsonV3), oldPassword);
+
+    return Web3App.getInstance().eth.accounts.encrypt(wallet.privateKey, newPassword);
+  } 
   
 }

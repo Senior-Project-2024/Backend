@@ -3,6 +3,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
 import { NotFoundException, Session } from '@nestjs/common';
+import { userMock1 } from './user.entity.mock';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -13,10 +14,10 @@ describe('UserController', () => {
 
     fakeUserService = {
       find: (email: string) => {
-        return Promise.resolve([ {id: 1, email, password: '1234'} ]);
+        return Promise.resolve([ { ...userMock1, email } ]);
       },
-      findOne: (id: number) => {
-        return Promise.resolve({ id, email: 'test@test.com', password: 'test'}); 
+      findOne: (id: string) => {
+        return Promise.resolve( { ...userMock1, id } ); 
       },
       // remove: (id: number) => {},
       // update: () => {}
@@ -24,7 +25,7 @@ describe('UserController', () => {
 
     fakeAuthService = {
       signIn: (email: string, password: string ) => {
-        return Promise.resolve({ id: 1, email, password });
+        return Promise.resolve( { ...userMock1, email, password, ethWallet: null } );
       },
       // signUp: () => {}
     }
@@ -60,11 +61,13 @@ describe('UserController', () => {
   it('findUser return user with the given id', async () => {
     const user = await controller.findUser('1');
     expect(user).toBeDefined();
-    expect(user.id).toEqual(1);
+    expect(user.id).toEqual("1");
   });
 
   it('signin updates session object and return user.', async () => {
-    let session = { userId: -1 };
+    let session = { 
+      organizeId: ""
+    };
 
     let user = await controller.signIn(
       { email: 'test@test.com', password: 'test'},
@@ -72,8 +75,8 @@ describe('UserController', () => {
     )
 
     expect(user).toBeDefined();
-    expect(user.id).toEqual(1);
-    expect(session.userId).toEqual(1);
+    expect(user.id).toEqual("1");
+    expect(session.organizeId).toEqual("1");
   });
 
 

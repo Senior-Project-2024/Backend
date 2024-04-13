@@ -6,6 +6,7 @@ import { User } from './user.entity';
 import { AuthService } from './auth.service'; 
 import { CryptoUtil } from 'src/utils/crypto.util';
 import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
+import { BlockChainService } from 'src/blockchian.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
@@ -13,7 +14,8 @@ import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
   providers: [
     UserService,
     AuthService,
-    CryptoUtil
+    CryptoUtil,
+    BlockChainService
   ],
   exports: [
     UserService,

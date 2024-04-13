@@ -1,6 +1,6 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsPhoneNumber, IsString, Validate, ValidateIf } from "class-validator";
 import { UserRole } from '../user.constant';
-import { IsThaiLandlineNumber } from "src/validators/thai-landline.validator";
+import { IsThaiLandlineNumber } from "../../validators/thai-landline.validator";
 
 export class CreateUserDto {
 

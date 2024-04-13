@@ -30,7 +30,7 @@ export class User {
   landlineNumber : string;
 
   @Column()
-  keyStoreJsonV3: KeyStore;
+  keyStoreJsonV3: KeyStore | null;
 
   @Column()
   tokenApi: string;

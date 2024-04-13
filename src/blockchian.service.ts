@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Contract, Web3BaseWalletAccount } from 'web3';
+import { Contract, KeyStore, Web3BaseWalletAccount } from 'web3';
 import { Web3App } from './utils/web3.util';
 import { contractABI, ContractABI } from 'src/utils/smart-contract/contractABI';
 import { Web3Account } from 'web3-eth-accounts';
@@ -36,5 +36,9 @@ export class BlockChainService {
 
   getWalletByPrivateKey(privateKey: string): Web3Account {
     return Web3App.getAccountFromPrivateKey(privateKey);
-  } 
+  }
+
+  async changePasswordEncryptedWallet(oldPassword: string, newPassword: string, keyStoreJsonV3: KeyStore) {
+    return Web3App.changePasswordToEncryptedWallet(oldPassword, newPassword, keyStoreJsonV3);
+  }
 }

@@ -15,8 +15,6 @@ export class ThirdPartyGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
 
-    console.log(request.query.tokenApi)
-    console.log(request.query.templateCode)
     if(!request.query.tokenApi) {
       return false;
     }

@@ -16,7 +16,7 @@ export class BadgesController {
 
   constructor(
     private badgeService: BadgesService,
-    private httpService: HttpService
+    // private httpService: HttpService
   ){} 
 
   @Get('mint')
@@ -49,8 +49,8 @@ export class BadgesController {
   @Post('mint')
   // @UseGuards(HostGuard)
   mintBadge(@CurrentUser() user: User, @Session() session: IAppSession, @Body() body: any) {
-    console.log(body);
-    console.log(session.userWalletPrivateKey);
+    // console.log(body);
+    // console.log(session.userWalletPrivateKey);
     // return this.badgeService.mintBadge(session.userWalletPrivateKey, 'test templateCode', 'testevidence');
   }
 
@@ -93,5 +93,6 @@ export class BadgesController {
   /*  Must think */
   // 1. how to keep templateCode and any data when mintBadge
 
+  
 
 }

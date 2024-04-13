@@ -21,7 +21,7 @@ export class UserService {
     if(!id || id.length === 0) {
       return null;
     }
-    console.log(id)
+
     const user: User | null = await this.userRepo.findOneBy( { _id: new ObjectId(id) });
     
     return user;
@@ -55,6 +55,8 @@ export class UserService {
       throw new NotFoundException('user not found!');
     }
 
+    console.log(attrs.password)
+
     // 2. update data
     Object.assign(user, attrs);
 
@@ -86,7 +88,6 @@ export class UserService {
     return user;
   }
   
-
   async findHashCodeAndUpdateIsConfirm(hashCode : string){
 
     const user = await this.userRepo.find({where : {hashCode}})

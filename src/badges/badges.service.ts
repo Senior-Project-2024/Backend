@@ -154,7 +154,6 @@ export class BadgesService {
         from: serverWallet.address,
       });
     } catch (error) {
-      console.log(error);
       throw new BadRequestException(error.innerError.message);
     }
 
