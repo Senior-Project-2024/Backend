@@ -260,7 +260,7 @@ export class AuthService {
 
     // compare hasPasswordFromRequest and hashPasswordFromDatabase
     if(hashPasswordFromRequest.toString('hex') !== hashPassword) {
-      throw new BadRequestException('bad password');
+      throw new BadRequestException('Your password is wrong');
     }
 
   }
