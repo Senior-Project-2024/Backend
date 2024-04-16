@@ -208,7 +208,7 @@
           password : password.value
         }
         
-        fetch("http://localhost:4000/auth/thirdParty",{
+        fetch("http://localhost:4000/auth/thirdParty?redirectURL={{ redirectURL }}",{
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -225,7 +225,7 @@
               }
 
             }else { // redirect to client
-              
+              window.open(responseJson.redirectURL);
             }
 
           })
@@ -238,18 +238,3 @@
   </body>
 </html>
 
-{{!-- 
-res.json().then((responseJson)=>{
-            if(responseJson.statusCode != 200 || responseJson.statusCode != 201){
-              console.log(responseJson)
-              if(typeof responseJson.message != "string"){
-                document.getElementById("error").innerHTML = responseJson.message[0];
-              }else{
-                document.getElementById("error").innerHTML = responseJson.message;
-              }
-
-            }
-          })
-
-
- --}}
