@@ -208,14 +208,38 @@
           password : password.value
         }
         
-        fetch("http://localhost:4000/auth/thirdParty?redirectURL={{redirectURL}}",{
+        fetch("http://localhost:4000/auth/thirdParty",{
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(formData)
-        }).then((res)=>{
-          res.json().then((responseJson)=>{
+        }).then((res) => res.json())
+          .then((responseJson) => {
+
+            if(responseJson.statusCode !== 201){
+              if(typeof responseJson.message != "string"){
+                document.getElementById("error").innerHTML = responseJson.message[0];
+              }else{
+                document.getElementById("error").innerHTML = responseJson.message;
+              }
+
+            }else { // redirect to client
+              
+            }
+
+          })
+          .catch((error)=>{
+          console.log(error)
+        }); 
+        
+      });
+    </script>
+  </body>
+</html>
+
+{{!-- 
+res.json().then((responseJson)=>{
             if(responseJson.statusCode != 200 || responseJson.statusCode != 201){
               console.log(responseJson)
               if(typeof responseJson.message != "string"){
@@ -226,11 +250,6 @@
 
             }
           })
-        }).catch((error)=>{
-          console.log(error)
-        }); 
-        
-      });
-    </script>
-  </body>
-</html>
+
+
+ --}}

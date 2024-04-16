@@ -38,29 +38,40 @@ export class UserController {
   }
 
   @Post('thirdParty')
-  @Redirect('')
   async thirdPartyAuthentication(
-    @Body() body: UserSignInReqDto, 
-    @Query('redirectURL') redirectURL: string) {
+    @Body() body: UserSignInReqDto,
+    @Res() res: Response,
+    @Session() session: IAppSession) {
 
     const user = await this.authService.signIn(body.email, body.password);
 
     if(user.role === UserRole.user) {
-      return { url: redirectURL };
-    } 
+      session.userId = user.id;
+      session.userWalletPrivateKey = user.ethWallet.privateKey;
+      return res.json({ statusCode: 201, message: 'login success'});
+    }
 
     throw new ForbiddenException('user not login!.');
   }
 
   @Get('thirdParty')
   @Render('form')
+  @Redirect('')
   async thirdPartyAuthenticationForm(
     @CurrentUser() user: User, 
     @Res() res: Response, 
     @Query('redirectURL') redirectURL: string) {
-    if(!user) {
-      return { redirectURL };
+
+    // if(!user) {
+    //   return { redirectURL };
+    // }
+    
+    console.log(user)
+    if (user) { 
+      return { url: 'https://google.com'}
     }
+    
+      
 
   }
 
