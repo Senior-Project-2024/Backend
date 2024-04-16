@@ -76,7 +76,7 @@ export class AuthService {
     const [user] = await this.userService.find(email);
 
     if(!user) {
-      throw new NotFoundException('user not found!.');
+      throw new NotFoundException('Email not found.');
     }
 
     // check Confirmation email
@@ -260,7 +260,7 @@ export class AuthService {
 
     // compare hasPasswordFromRequest and hashPasswordFromDatabase
     if(hashPasswordFromRequest.toString('hex') !== hashPassword) {
-      throw new BadRequestException('bad password');
+      throw new BadRequestException('Your password is wrong');
     }
 
   }

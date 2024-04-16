@@ -91,6 +91,12 @@
         border-radius: 22px;
         border-width: 0;
         padding: 12px 25px;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+      }
+      .button:hover{
+        background: #61398F;
+        scale: 1.05;
       }
       .text-button {
         font-size: 18px;
@@ -101,13 +107,19 @@
         font-weight: 300;
         color: #292929;
       }
+      .error{
+        font-size: 16px;
+        font-weight: 300;
+        color: #D92D20;
+      }
     </style>
   </head>
   <body>
     <form
       class="flex flex-col items-center box"
-      action="./thirdParty?redirectURL={{ redirectURL }}"
-      method="post"
+      id="loginForm"
+      {{!-- action="./thirdParty?redirectURL={{ redirectURL }}"
+      method="post" --}}
     >
       <div class="flex flex-col" style="gap: 16px; align-self: start">
         <p class="welcome">
@@ -127,6 +139,7 @@
             type="text"
             class="input"
             placeholder="Example@gmail.com"
+            value="pathinya@gmail.com"
             autofocus
           />
         </div>
@@ -134,17 +147,19 @@
           <p class="text18">Password</p>
           <input
             name="password"
-            id="passsword"
+            id="password"
             type="password"
             class="input"
+            value="Meaw12345"
             placeholder="*********"
           />
-          <a
+          {{!-- <a
             href="http://localhost:8080/"
             target="_blank"
             class="forgotPassword"
             >Forgot Password?</a
-          >
+          > --}}
+          <p class="error" id="error"></p>
         </div>
       </div>
       <div class="flex flex-col" style="gap: 15px">
@@ -180,5 +195,42 @@
         </p>
       </div>
     </form>
+    <script>
+      let loginForm = document.getElementById("loginForm");
+      loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        let email = document.getElementById("email");
+        let password = document.getElementById("password");
+        
+        const formData = {
+          email : email.value,
+          password : password.value
+        }
+        
+        fetch("http://localhost:4000/auth/thirdParty?redirectURL={{redirectURL}}",{
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData)
+        }).then((res)=>{
+          res.json().then((responseJson)=>{
+            if(responseJson.statusCode != 200 || responseJson.statusCode != 201){
+              console.log(responseJson)
+              if(typeof responseJson.message != "string"){
+                document.getElementById("error").innerHTML = responseJson.message[0];
+              }else{
+                document.getElementById("error").innerHTML = responseJson.message;
+              }
+
+            }
+          })
+        }).catch((error)=>{
+          console.log(error)
+        }); 
+        
+      });
+    </script>
   </body>
 </html>
