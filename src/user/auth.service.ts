@@ -76,7 +76,7 @@ export class AuthService {
     const [user] = await this.userService.find(email);
 
     if(!user) {
-      throw new NotFoundException('user not found!.');
+      throw new NotFoundException('Email not found.');
     }
 
     // check Confirmation email

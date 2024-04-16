@@ -9,12 +9,13 @@ async function bootstrap() {
     AppModule,
   );
 
-  app.enableCors({
-    origin: 'http://localhost:8080',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type,Authorization,Set-Cookie',
-    credentials: true, 
-  });
+  // app.enableCors({
+  //   origin: ['http://localhost:8080', 'http://localhost:4000'],
+  //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  //   allowedHeaders: 'Content-Type,Authorization,Set-Cookie',
+  //   credentials: true, 
+  // });
+  app.enableCors();
   
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
