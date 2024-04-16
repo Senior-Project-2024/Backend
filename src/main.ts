@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -16,8 +16,8 @@ async function bootstrap() {
     credentials: true, 
   });
   
-  app.useStaticAssets(join(__dirname, '..', 'public'));
-  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.useStaticAssets(resolve('./public'));
+  app.setBaseViewsDir(resolve('./views'));
   app.setViewEngine('hbs');
   
   await app.listen(4000);

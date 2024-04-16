@@ -58,7 +58,6 @@ export class UserController {
     @CurrentUser() user: User, 
     @Res() res: Response, 
     @Query('redirectURL') redirectURL: string) {
-    
     if(!user) {
       return { redirectURL };
     }
