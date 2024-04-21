@@ -51,7 +51,8 @@ export class AppModule {
     consumer.apply(
       cookieSession({
         keys: ['asdasdasd'],
-        sameSite: 'lax'
+        sameSite: 'lax',
+        domain: 'localhost',
       })
     )
     .forRoutes('*');

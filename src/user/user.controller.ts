@@ -49,7 +49,8 @@ export class UserController {
     if(user.role === UserRole.user) {
       session.userId = user.id;
       session.userWalletPrivateKey = user.ethWallet.privateKey;
-      return res.json({ statusCode: 201, message: 'login success', redirectURL});
+      const redirectURL_with_params = redirectURL + "?userId=" + user.id + "&publickey=" + user.ethWallet.address
+      return res.json({ statusCode: 201, message: 'login success', redirectURL : redirectURL_with_params  });
     }
 
     throw new ForbiddenException('user not login!.');
