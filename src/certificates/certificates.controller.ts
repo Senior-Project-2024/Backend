@@ -1,5 +1,74 @@
-import { Controller,Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { OrganizeGuard } from 'src/guards/organize.guard';
+import { CurrentUser } from 'src/user/decorators/current-user.decorator';
+import { UserRole } from 'src/user/user.constant';
+import { User } from 'src/user/user.entity';
+import { CertificatesService } from './certificates.service';
+import { CreateCertificateTemplateDto } from './dtos/create-certificate-template.dto';
 
 @Controller('certificates')
 export class CertificatesController {
-}
+
+  constructor(
+    private certificateService: CertificatesService
+  ) {} 
+
+  // @Get('mint')
+  // @UseGuards(ThirdPartyGuard)
+  // mintBadge(
+  //   @Query('publickey') publicKey: string, 
+  //   @Query('templateCode') templateCode: string,
+  //   @Query('evidenceURL') evidenceURL: string,
+  // ) {
+  //   return this.certificateService.mintBadge(publicKey, templateCode, evidenceURL);
+  // }
+
+  @Post('')
+  @UseGuards(OrganizeGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  async createBadgeTemplate(
+    @Body() body: CreateCertificateTemplateDto, 
+    @CurrentUser(UserRole.organization) organize: User,
+    @UploadedFile() image: Express.Multer.File
+     ) {
+
+    try {
+      await this.certificateService.createTemplate(body, organize.id, image);
+      return this.certificateService.findAll();
+    }
+    catch(err) {
+      throw new BadRequestException(`Can not create badge template: ${err}`);
+    }
+
+  }
+
+  @Patch('/:id') 
+  @UseGuards(OrganizeGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  async updateBadgeTemplete(
+    @Body() body: CreateCertificateTemplateDto, 
+    @CurrentUser(UserRole.organization) organize: User,
+    @UploadedFile() image: Express.Multer.File,
+    @Param('id') id : string
+    ) {
+      try {
+        await this.certificateService.updateTemplete(body, organize.id, image, id);
+        return this.certificateService.findAll();
+      }
+      catch(err) {
+        throw new BadRequestException(`Can not create badge template: ${err}`);
+      }
+  
+    }
+
+  // @Get('all')
+  // async getAllBadges(){
+  //   return this.certificateService.findAll();
+  // }
+
+  // @Get('/:id')
+  // async getBadgeById(@Param('id') id: string){
+  //   return this.certificateService.findOne(id)
+  // }
+} 

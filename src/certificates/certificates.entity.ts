@@ -3,7 +3,7 @@ import { ExpireDto } from "src/dtos/expire.dto";
 import { ImageDto } from "src/dtos/image.dto";
 
 @Entity()
-export class Badge {
+export class Certificate {
 
   @ObjectIdColumn()
   id: string;
@@ -34,6 +34,9 @@ export class Badge {
 
   @Column()
   imageInfo: ImageDto;
+
+  @Column()
+  badgeRequired: string[];
 
   @Column()
   userId: string;

@@ -1,7 +1,7 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { Transform } from "class-transformer";
+import { IsNotEmpty, IsNumber } from "class-validator";
 
-export class ExpireObject {
+export class ExpireDto {
 
   @IsNumber()
   @IsNotEmpty()

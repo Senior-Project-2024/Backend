@@ -20,38 +20,13 @@ export class BadgesController {
   ){} 
 
   @Get('mint')
-  // @UseGuards(ThirdPartyGuard)
-  beforeMintBadge(
-    @CurrentUser() user: User, 
-    // @Query('templateCode') templateCode: string,
-    // @Query('tokenApi') tokenApi: string,
-  ) { 
-
-    //action="mint?tokenApi=${tokenApi}&templateCode=${templateCode}"
-    if(!user) {
-      return `
-      <form method="POST">
-        <div>
-          <label>Email</label>
-          <input name="email" />
-        </div>
-        <div>
-          <label>Password</label>
-          <input name="password" type="password"/> 
-        </div>
-        <button>submit</button>
-      </form>`
-    }
-
-    // call mintBadge(privateKey: string, templateCode: string, evidenceURL: string);
-  }
-
-  @Post('mint')
-  // @UseGuards(HostGuard)
-  mintBadge(@CurrentUser() user: User, @Session() session: IAppSession, @Body() body: any) {
-    // console.log(body);
-    // console.log(session.userWalletPrivateKey);
-    // return this.badgeService.mintBadge(session.userWalletPrivateKey, 'test templateCode', 'testevidence');
+  @UseGuards(ThirdPartyGuard)
+  mintBadge(
+    @Query('publickey') publicKey: string, 
+    @Query('templateCode') templateCode: string,
+    @Query('evidenceURL') evidenceURL: string,
+  ) {
+    return this.badgeService.mintBadge(publicKey, templateCode, evidenceURL);
   }
 
   @Post('')

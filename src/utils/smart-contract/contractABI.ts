@@ -104,6 +104,23 @@ export const contractABI = [
     type: 'function',
   },
   {
+    inputs: [],
+    name: 'getBlockTime',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'string', name: 'templateCode', type: 'string' },
+      { internalType: 'address', name: 'owner', type: 'address' },
+    ],
+    name: 'getTime',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [{ internalType: 'address', name: 'pocketOwner', type: 'address' }],
     name: 'getUserBadgePocket',
     outputs: [
@@ -111,8 +128,8 @@ export const contractABI = [
         components: [
           { internalType: 'uint256', name: 'id', type: 'uint256' },
           { internalType: 'string', name: 'issuedBy', type: 'string' },
-          { internalType: 'string', name: 'date', type: 'string' },
-          { internalType: 'string', name: 'expire', type: 'string' },
+          { internalType: 'uint256', name: 'issueUnixTime', type: 'uint256' },
+          { internalType: 'uint256', name: 'expireUnixTime', type: 'uint256' },
           { internalType: 'string', name: 'templateCode', type: 'string' },
           { internalType: 'string', name: 'evidenceURL', type: 'string' },
         ],
@@ -132,8 +149,9 @@ export const contractABI = [
         components: [
           { internalType: 'uint256', name: 'id', type: 'uint256' },
           { internalType: 'string', name: 'issuedBy', type: 'string' },
-          { internalType: 'string', name: 'date', type: 'string' },
-          { internalType: 'string', name: 'expire', type: 'string' },
+          { internalType: 'uint256', name: 'issueUnixTime', type: 'uint256' },
+          { internalType: 'uint256', name: 'expireUnixTime', type: 'uint256' },
+          { internalType: 'string', name: 'templateCode', type: 'string' },
           { internalType: 'string[]', name: 'badgeCriteria', type: 'string[]' },
         ],
         internalType: 'struct Soulbound.Certificate[]',
@@ -188,8 +206,8 @@ export const contractABI = [
       {
         components: [
           { internalType: 'string', name: 'issuedBy', type: 'string' },
-          { internalType: 'string', name: 'date', type: 'string' },
-          { internalType: 'string', name: 'expire', type: 'string' },
+          { internalType: 'uint256', name: 'issueUnixTime', type: 'uint256' },
+          { internalType: 'uint256', name: 'expireUnixTime', type: 'uint256' },
           { internalType: 'string', name: 'templateCode', type: 'string' },
           { internalType: 'string', name: 'evidenceURL', type: 'string' },
         ],
@@ -210,8 +228,9 @@ export const contractABI = [
       {
         components: [
           { internalType: 'string', name: 'issuedBy', type: 'string' },
-          { internalType: 'string', name: 'date', type: 'string' },
-          { internalType: 'string', name: 'expire', type: 'string' },
+          { internalType: 'uint256', name: 'issueUnixTime', type: 'uint256' },
+          { internalType: 'uint256', name: 'expireUnixTime', type: 'uint256' },
+          { internalType: 'string', name: 'templateCode', type: 'string' },
           { internalType: 'string[]', name: 'badgeCriteria', type: 'string[]' },
         ],
         internalType: 'struct Soulbound.CertificateRequest',
@@ -315,8 +334,6 @@ export const contractABI = [
     type: 'function',
   },
 ];
-
-
 
 export type ContractABI = [
   { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
@@ -424,6 +441,23 @@ export type ContractABI = [
     type: 'function',
   },
   {
+    inputs: [],
+    name: 'getBlockTime',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'string', name: 'templateCode', type: 'string' },
+      { internalType: 'address', name: 'owner', type: 'address' },
+    ],
+    name: 'getTime',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [{ internalType: 'address', name: 'pocketOwner', type: 'address' }],
     name: 'getUserBadgePocket',
     outputs: [
@@ -431,8 +465,8 @@ export type ContractABI = [
         components: [
           { internalType: 'uint256', name: 'id', type: 'uint256' },
           { internalType: 'string', name: 'issuedBy', type: 'string' },
-          { internalType: 'string', name: 'date', type: 'string' },
-          { internalType: 'string', name: 'expire', type: 'string' },
+          { internalType: 'uint256', name: 'issueUnixTime', type: 'uint256' },
+          { internalType: 'uint256', name: 'expireUnixTime', type: 'uint256' },
           { internalType: 'string', name: 'templateCode', type: 'string' },
           { internalType: 'string', name: 'evidenceURL', type: 'string' },
         ],
@@ -452,8 +486,9 @@ export type ContractABI = [
         components: [
           { internalType: 'uint256', name: 'id', type: 'uint256' },
           { internalType: 'string', name: 'issuedBy', type: 'string' },
-          { internalType: 'string', name: 'date', type: 'string' },
-          { internalType: 'string', name: 'expire', type: 'string' },
+          { internalType: 'uint256', name: 'issueUnixTime', type: 'uint256' },
+          { internalType: 'uint256', name: 'expireUnixTime', type: 'uint256' },
+          { internalType: 'string', name: 'templateCode', type: 'string' },
           { internalType: 'string[]', name: 'badgeCriteria', type: 'string[]' },
         ],
         internalType: 'struct Soulbound.Certificate[]',
@@ -508,8 +543,8 @@ export type ContractABI = [
       {
         components: [
           { internalType: 'string', name: 'issuedBy', type: 'string' },
-          { internalType: 'string', name: 'date', type: 'string' },
-          { internalType: 'string', name: 'expire', type: 'string' },
+          { internalType: 'uint256', name: 'issueUnixTime', type: 'uint256' },
+          { internalType: 'uint256', name: 'expireUnixTime', type: 'uint256' },
           { internalType: 'string', name: 'templateCode', type: 'string' },
           { internalType: 'string', name: 'evidenceURL', type: 'string' },
         ],
@@ -530,8 +565,9 @@ export type ContractABI = [
       {
         components: [
           { internalType: 'string', name: 'issuedBy', type: 'string' },
-          { internalType: 'string', name: 'date', type: 'string' },
-          { internalType: 'string', name: 'expire', type: 'string' },
+          { internalType: 'uint256', name: 'issueUnixTime', type: 'uint256' },
+          { internalType: 'uint256', name: 'expireUnixTime', type: 'uint256' },
+          { internalType: 'string', name: 'templateCode', type: 'string' },
           { internalType: 'string[]', name: 'badgeCriteria', type: 'string[]' },
         ],
         internalType: 'struct Soulbound.CertificateRequest',

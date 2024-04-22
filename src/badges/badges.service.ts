@@ -1,18 +1,18 @@
+import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ObjectId } from 'mongodb';
+import { BlockChainService } from 'src/blockchian.service';
+import { CloudinaryResponse } from 'src/cloudinary/cloudinary-response';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { DateUtil } from 'src/utils/date.util';
+import { NFTStorageClientUtil } from 'src/utils/nft-storage.util';
+import { ContractABI } from 'src/utils/smart-contract/contractABI';
 import { MongoRepository } from 'typeorm';
 import { Contract, Web3BaseWalletAccount } from 'web3';
-import { ContractABI } from 'src/utils/smart-contract/contractABI';
-import { BlockChainService } from 'src/blockchian.service';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Badge } from './badges.entity';
 import { CreateBadgeTemplateDto } from './dtos/create-badge-template.dto';
-import { ObjectId } from 'mongodb';
-import { DateUtil } from 'src/utils/date.util';
-import { CloudinaryResponse } from 'src/cloudinary/cloudinary-response';
-import { HttpService } from '@nestjs/axios';
-import { NFTStorageClientUtil } from 'src/utils/nft-storage.util';
-import { BadgeImageObject } from './entitys/badge-image.entity';
+import { ImageDto } from 'src/dtos/image.dto';
 
 @Injectable() 
 export class BadgesService {
@@ -27,7 +27,7 @@ export class BadgesService {
 
   async createTemplate(badgeTemplateDto: CreateBadgeTemplateDto, organizationId: string, image: Express.Multer.File)  {
     const uploadedImage: CloudinaryResponse = await this.cloudinaryService.uploadImage(image);
-    const imageInfo: BadgeImageObject = {
+    const imageInfo: ImageDto = {
       imageURL: uploadedImage.secure_url,
       mimeType: uploadedImage.format,
       originalFilename: image.originalname,
@@ -44,7 +44,7 @@ export class BadgesService {
   async updateTemplete(badgeTemplateDto: CreateBadgeTemplateDto, organizationId: string, image: Express.Multer.File | undefined, badgeId : string){
     if(image){
       const uploadedImage: CloudinaryResponse = await this.cloudinaryService.uploadImage(image);
-      const imageInfo: BadgeImageObject = {
+      const imageInfo: ImageDto = {
         imageURL: uploadedImage.secure_url,
         mimeType: uploadedImage.format,
         originalFilename: image.originalname,
@@ -121,7 +121,7 @@ export class BadgesService {
     return imageResponse.data;
   }
 
-  async mintBadge(userPrivateKey: string, templateCode: string, evidenceURL: string) {
+  async mintBadge(userPublicKey: string, templateCode: string, evidenceURL: string) {
 
     /* call dependencies for minting user badge to our smart contracts */
     /* 1. our app wallet (server wallet)  */
@@ -130,26 +130,27 @@ export class BadgesService {
     const contract: Contract<ContractABI>  = this.blockchainService.getSmartContract();
 
     /* prepare user data for minting */
-    /* 1. userWallet */
+    /* 1. userPublicKey from params */
     /* 2. query badge template for create instance of badge */
-    const userWallet: Web3BaseWalletAccount = this.blockchainService.getWalletByPrivateKey(userPrivateKey);
 
     const badgeTemplate: Badge = await this.findByTemplateCode(templateCode);
 
-    const startDate: Date = new Date();
-    const expireDate: Date = DateUtil.addCurrentDateWithYMD
+    const startMillisecs: number = Date.now();
+    const expireMillisecs: number = DateUtil.addCurrentDateWithYMDInMillisecs
     (
       badgeTemplate.expiration.year,
       badgeTemplate.expiration.month,
       badgeTemplate.expiration.day
     );
+    /* warn! convert to unix before send to smart contract */
+    /* because smart contract use unix time */
 
     /* create user badge for minting and store it on our smart contracts  */
     const userBadge = { 
       issuedBy: badgeTemplate.name,
-      date: startDate.toISOString().split('T')[0],
-      expire: expireDate.toISOString().split('T')[0],
-      templateCode: templateCode,
+      issueUnixTime: DateUtil.millisecToUnix(startMillisecs),
+      expireUnixTime: DateUtil.millisecToUnix(expireMillisecs),
+      templateCode,
       evidenceURL
     };
 
@@ -160,7 +161,7 @@ export class BadgesService {
       throw new NotFoundException('Not Found Image Blob of Badge Image.');
     }
 
-    const metadata = await this.nftStorageClientUtils.uploadNFTMetaData(badgeTemplate, imageBlob);
+    const metadata = await this.nftStorageClientUtils.uploadNFTMetaDataofBadge(badgeTemplate, imageBlob);
 
     if(!metadata) {
       throw new BadRequestException('Can not upload metadata of nft');
@@ -168,7 +169,7 @@ export class BadgesService {
 
     try {
       await contract.methods.safeMintBadge(
-        userWallet.address,
+        userPublicKey,
         userBadge,
         metadata.url
       ).send({

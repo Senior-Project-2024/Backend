@@ -2,7 +2,7 @@ import { IsString, IsArray, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 import { ExpireDto } from "src/dtos/expire.dto";
 
-export class CreateBadgeTemplateDto {
+export class CreateCertificateTemplateDto {
 
   @IsString()
   name: string;
@@ -28,8 +28,14 @@ export class CreateBadgeTemplateDto {
   })
   skill: string[];
 
+  @IsArray()
+  @IsString({
+    each: true
+  })
+  badgeRequired: string[];
+
   @ValidateNested({ each: true })
   @Type(() => ExpireDto)
   expiration: ExpireDto;
-  
+
 }

@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NFTStorage, File, Blob, CIDString } from 'nft.storage';
+import { CIDString, File, NFTStorage } from 'nft.storage';
 import { Badge } from 'src/badges/badges.entity';
+import { Certificate } from 'src/certificates/certificates.entity';
 
 @Injectable()
 export class NFTStorageClientUtil {
@@ -22,7 +23,7 @@ export class NFTStorageClientUtil {
     return await this.createClient().storeBlob(new File([image.buffer], 'image', { type: `image/${image.mimetype}` }));
   }
 
-  async uploadNFTMetaData(badge: Badge, imageBlob: ArrayBuffer){
+  async uploadNFTMetaDataofBadge(badge: Badge, imageBlob: ArrayBuffer){
     return await this.createClient().store({
       name: badge.name,
       description: badge.descriptionCourse,
@@ -30,6 +31,18 @@ export class NFTStorageClientUtil {
         [imageBlob], 
         `${badge.name}.${badge.imageInfo.mimeType}`, 
         { type: `image/${badge.imageInfo.mimeType}` }
+        ) 
+    });
+  }
+
+  async uploadNFTMetaDataofCertificate(certificate: Certificate, imageBlob: ArrayBuffer){
+    return await this.createClient().store({
+      name: certificate.name,
+      description: certificate.descriptionCourse,
+      image: new File(
+        [imageBlob], 
+        `${certificate.name}.${certificate.imageInfo.mimeType}`, 
+        { type: `image/${certificate.imageInfo.mimeType}` }
         ) 
     });
   }
