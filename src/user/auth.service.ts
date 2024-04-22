@@ -42,7 +42,8 @@ export class AuthService {
     }
 
     if(userDto.role == UserRole.organization) {
-      const [userByLandlineNumber] = await this.userService.findByLandlineNumber(userDto.telNo);
+      const [userByLandlineNumber] = await this.userService.findByLandlineNumber(userDto.landlineNumber);
+      // console.log(userByLandlineNumber)
       if(userByLandlineNumber){
         throw new BadRequestException('LandlineNumber already in use!.');
       }
