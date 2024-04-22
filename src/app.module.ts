@@ -53,8 +53,7 @@ export class AppModule {
         keys: ['asdasdasd'],
         sameSite: 'none',
         secure: true,
-        httpOnly: true,
-        domain: 'proveself-f-test6.vercel.app'
+        httpOnly: true
       })
     )
     .forRoutes('*');

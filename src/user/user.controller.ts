@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import { KeyStore } from 'web3';
 import { Get, Patch, Post, Controller, Body, Param, Query, Delete, Session, UseGuards, NotFoundException, BadRequestException, Request, Redirect, Headers, Res, HttpStatus, ForbiddenException, Render } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
