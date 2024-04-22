@@ -95,9 +95,8 @@ export class UserController {
   @Post('/signin')
   @Serialize(UserSignInRespDto)
   async signIn(@Body() body: UserSignInReqDto, @Session() session: IAppSession): Promise<UserSignInRespDto> {
-    console.log(session);
     const user = await this.authService.signIn(body.email, body.password);
-
+    
     if(user.role === UserRole.user) {
       session.userId = user.id;
       session.userWalletPrivateKey = user.ethWallet.privateKey;
