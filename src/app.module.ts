@@ -52,8 +52,6 @@ export class AppModule {
       cookieSession({
         keys: ['asdasdasd'],
         sameSite: 'none',
-        secure: true,
-        httpOnly: true
       })
     )
     .forRoutes('*');
