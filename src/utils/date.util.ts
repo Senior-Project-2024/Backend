@@ -30,11 +30,11 @@ export class DateUtil {
   } 
 
   static millisecToUnix(millsecs: number): number{
-    return millsecs/1000;
+    return Math.round(millsecs/1000);
   }
 
   static unixToMillisec(unix: number): number{
-    return unix * 1000;
+    return Math.round(unix * 1000);
   }
 
   static validateYMD(year: number, month: number, day: number): boolean {

@@ -10,6 +10,7 @@ import { BadgesModule } from './badges/badges.module';
 import { CertificatesModule } from './certificates/certificates.module';
 import { Badge } from './badges/badges.entity';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { Certificate } from './certificates/certificates.entity';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -26,7 +27,7 @@ const cookieSession = require('cookie-session');
           url: config.get<string>('DB_URI'),
           database: config.get<string>('DB_NAME'),
           synchronize: true,
-          entities: [User, Badge],
+          entities: [User, Badge, Certificate],
         };
       }
     }),

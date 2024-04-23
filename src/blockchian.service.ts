@@ -5,6 +5,56 @@ import { Web3App } from './utils/web3.util';
 import { contractABI, ContractABI } from 'src/utils/smart-contract/contractABI';
 import { Web3Account } from 'web3-eth-accounts';
 
+export type BadgeResp = {
+  id: number;
+  issuedBy: string;
+  issueUnixTime: bigint;
+  expireUnixTime: bigint;
+  templateCode: string;
+  evidenceURL: string;
+}
+
+export type CertifcateResp = {
+  id: number;
+  issuedBy: string;
+  issueUnixTime: bigint;
+  expireUnixTime: bigint;
+  templateCode: string;
+  badgeCriteria: string[];
+}
+
+export type BadgeStructOutput = [
+  id: bigint,
+  issuedBy: string,
+  issueUnixTime: bigint,
+  expireUnixTime: bigint,
+  templateCode: string,
+  evidenceURL: string
+] & {
+  id: bigint;
+  issuedBy: string;
+  issueUnixTime: bigint;
+  expireUnixTime: bigint;
+  templateCode: string;
+  evidenceURL: string;
+};
+
+export type CertificateStructOutput = [
+  id: bigint,
+  issuedBy: string,
+  issueUnixTime: bigint,
+  expireUnixTime: bigint,
+  templateCode: string,
+  badgeCriteria: string[]
+] & {
+  id: bigint;
+  issuedBy: string;
+  issueUnixTime: bigint;
+  expireUnixTime: bigint;
+  templateCode: string;
+  badgeCriteria: string[];
+};
+
 @Injectable()
 export class BlockChainService {
 
@@ -41,4 +91,47 @@ export class BlockChainService {
   async changePasswordEncryptedWallet(oldPassword: string, newPassword: string, keyStoreJsonV3: KeyStore) {
     return Web3App.changePasswordToEncryptedWallet(oldPassword, newPassword, keyStoreJsonV3);
   }
+  
+  async mappingBadgeFromSol(badgeFromContract: any[]): Promise<BadgeResp[]>{
+    let newBadge: BadgeResp[] = [];
+
+    for(let badge of badgeFromContract) {
+
+      let newStructBadge: BadgeResp = {
+        id: Number(badge[0]),
+        issuedBy: badge[1],
+        issueUnixTime: badge[2],
+        expireUnixTime: badge[3],
+        templateCode: badge[4],
+        evidenceURL: badge[5]
+      };
+
+      newBadge.push(newStructBadge);
+    }
+
+    return newBadge;
+  }
+
+  async mappingCertificateFromSol(certificateFromContract: any[]): Promise<CertifcateResp[]> {
+
+    let newCertificate: CertifcateResp[] = [];
+
+    for(let certificate of certificateFromContract) {
+
+      let newStructBadge: CertifcateResp = {
+        id: Number(certificate[0]),
+        issuedBy: certificate[1],
+        issueUnixTime: certificate[2],
+        expireUnixTime: certificate[3],
+        templateCode: certificate[4],
+        badgeCriteria: certificate[5],
+      };
+
+      newCertificate.push(newStructBadge);
+    }
+
+    return newCertificate;
+  }
+
+
 }

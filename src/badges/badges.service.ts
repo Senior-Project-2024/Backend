@@ -81,7 +81,7 @@ export class BadgesService {
       return null;
     } 
 
-    return this.badgeRepo.find( { where: { userId } } );
+    return this.badgeRepo.find( { where: { userId: new ObjectId(userId) } } );
   }
   
   async findByTemplateCode(templateCode: string): Promise<Badge> {
@@ -113,7 +113,7 @@ export class BadgesService {
   async getBadgeBlobFromImageURL(imageURL: string): Promise<ArrayBuffer | null> {
 
     const imageResponse = await this.httpService.axiosRef.get(imageURL, { responseType: 'arraybuffer'});
-    
+
     if(imageResponse.status !== 200) {
       return null;
     }
@@ -133,7 +133,7 @@ export class BadgesService {
     /* 1. userPublicKey from params */
     /* 2. query badge template for create instance of badge */
 
-    const badgeTemplate: Badge = await this.findByTemplateCode(templateCode);
+    const badgeTemplate: Badge = await this.findOne(templateCode);
 
     const startMillisecs: number = Date.now();
     const expireMillisecs: number = DateUtil.addCurrentDateWithYMDInMillisecs
@@ -176,7 +176,7 @@ export class BadgesService {
         from: serverWallet.address,
       });
     } catch (error) {
-      throw new BadRequestException(error.innerError.message);
+      throw new BadRequestException(error);
     }
 
     /* remove server account from wallet of provider */

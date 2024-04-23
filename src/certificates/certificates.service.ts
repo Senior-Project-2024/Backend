@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BlockChainService } from 'src/blockchian.service';
+import { BadgeResp, BlockChainService, BadgeStructOutput } from 'src/blockchian.service';
 import { CloudinaryResponse } from 'src/cloudinary/cloudinary-response';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { ImageDto } from 'src/dtos/image.dto';
@@ -119,6 +119,53 @@ export class CertificatesService {
     }
 
     return imageResponse.data;
+  }
+
+  async findCertificateUserCanMint(userPublickey: string) {
+
+    const certificateOfEachOrganize = this.certificateRepo.aggregate([
+      {
+       $group: {
+        _id: '$organizeName',
+        certificates: {
+          $push: '$$ROOT'
+        }
+       } 
+      },
+      {
+        $unwind: '$certificates'
+      },
+      {
+        $unset: 'certificates.organizeName'
+      },
+      {
+        $group: {
+         _id: '$_id',
+         certificates: {
+           $push: '$certificates'
+         }
+        } 
+      },
+      {
+        $addFields: {
+          organizeName: '$_id'
+        }
+      },
+      {
+        $project: {
+          _id: 0
+        }
+      }
+    ]).toArray();
+
+    console.log(userPublickey)
+    const contract: Contract<ContractABI> = this.blockchainService.getSmartContract();
+    const userPocketBadgeFromSmartContract: BadgeStructOutput[] = await contract.methods.getUserBadgePocket(userPublickey).call();
+    const userPocketBadge: BadgeResp[] = await this.blockchainService.mappingBadgeFromSol(userPocketBadgeFromSmartContract); 
+
+    console.log(userPocketBadge);
+
+    return certificateOfEachOrganize;
   }
 
   async mintCertificate(userPublickey: string, templateCode: string) {

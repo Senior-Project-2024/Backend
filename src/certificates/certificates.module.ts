@@ -1,6 +1,6 @@
 import { UserModule } from './../user/user.module';
 import { Module } from '@nestjs/common';
-import { CertificatesController } from './certificates.controller';
+import CertificatesController from './certificates.controller';
 import { CertificatesService } from './certificates.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Certificate } from './certificates.entity';

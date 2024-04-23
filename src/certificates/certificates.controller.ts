@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Param, Get, Patch, Post, UploadedFile, UseGuards, UseInterceptors, Session, Query } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { OrganizeGuard } from 'src/guards/organize.guard';
 import { CurrentUser } from 'src/user/decorators/current-user.decorator';
@@ -6,9 +6,10 @@ import { UserRole } from 'src/user/user.constant';
 import { User } from 'src/user/user.entity';
 import { CertificatesService } from './certificates.service';
 import { CreateCertificateTemplateDto } from './dtos/create-certificate-template.dto';
+import { IAppSession } from 'src/utils/interfaces/app-session.interface';
 
 @Controller('certificates')
-export class CertificatesController {
+export default class CertificatesController {
 
   constructor(
     private certificateService: CertificatesService
@@ -38,7 +39,7 @@ export class CertificatesController {
       return this.certificateService.findAll();
     }
     catch(err) {
-      throw new BadRequestException(`Can not create badge template: ${err}`);
+      throw new BadRequestException(`Can not create certificate template: ${err}`);
     }
 
   }
@@ -57,11 +58,16 @@ export class CertificatesController {
         return this.certificateService.findAll();
       }
       catch(err) {
-        throw new BadRequestException(`Can not create badge template: ${err}`);
+        throw new BadRequestException(`Can not create certificate template: ${err}`);
       }
   
     }
 
+  @Get('organize')
+  async getBadgeByOrganize(@Query('publickey') userPublickey : string){
+    return this.certificateService.findCertificateUserCanMint(userPublickey);
+  }
+  
   // @Get('all')
   // async getAllBadges(){
   //   return this.certificateService.findAll();
