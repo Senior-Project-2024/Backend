@@ -67,6 +67,11 @@ export default class CertificatesController {
   async getBadgeByOrganize(@Query('publickey') userPublickey : string){
     return this.certificateService.findCertificateUserCanMint(userPublickey);
   }
+
+  @Get('/organize/:id')
+  async getCertificateByOrgnizeId(@Param('id') id: string){
+    return this.certificateService.findByUserId(id)
+  }
   
   // @Get('all')
   // async getAllBadges(){

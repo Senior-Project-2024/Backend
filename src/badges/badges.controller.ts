@@ -72,6 +72,11 @@ export class BadgesController {
     return this.badgeService.findAll();
   }
 
+  @Get('/organize/:id')
+  async getBadgeByOrgnizeId(@Param('id') id: string){
+    return this.badgeService.findByUserId(id)
+  }
+
   @Get('/:id')
   async getBadgeById(@Param('id') id: string){
     return this.badgeService.findOne(id)

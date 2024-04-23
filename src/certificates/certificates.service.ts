@@ -85,7 +85,7 @@ export class CertificatesService {
       return null;
     } 
 
-    return this.certificateRepo.find( { where: { userId } } );
+    return this.certificateRepo.find( { where: { userId: new ObjectId(userId) } } );
   }
 
   async update(id: string, attrs: Partial<Certificate>): Promise<Certificate> {

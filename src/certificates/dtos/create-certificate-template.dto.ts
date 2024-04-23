@@ -1,4 +1,4 @@
-import { IsString, IsArray, ValidateNested } from "class-validator";
+import { IsString, IsArray, ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
 import { ExpireDto } from "src/dtos/expire.dto";
 
@@ -14,14 +14,9 @@ export class CreateCertificateTemplateDto {
   earningCriteria: string;
 
   @IsString()
-  templateCode: string;
-
-  @IsString()
-  linkCourse: string;
-
-  @IsString()
   organizeName: string;
   
+  @IsOptional()
   @IsArray()
   @IsString({
     each: true
