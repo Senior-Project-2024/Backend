@@ -73,6 +73,11 @@ export default class CertificatesController {
     return this.certificateService.findByUserId(id)
   }
   
+  @Get('/organizeFullBadge/:id')
+  async findByUserIdWithBadgename(@Param('id') id: string){
+    return this.certificateService.findByUserIdWithBadgename(id)
+  }
+  
   // @Get('all')
   // async getAllBadges(){
   //   return this.certificateService.findAll();
