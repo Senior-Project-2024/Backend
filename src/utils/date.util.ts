@@ -35,6 +35,10 @@ export class DateUtil {
 
   static unixToMillisec(unix: number): number{
     return Math.round(unix * 1000);
+  } 
+
+  static currentUnixTime(): number {
+    return Math.round(Date.now()/1000);
   }
 
   static validateYMD(year: number, month: number, day: number): boolean {

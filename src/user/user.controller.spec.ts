@@ -4,11 +4,15 @@ import { UserService } from './user.service';
 import { AuthService } from './auth.service';
 import { NotFoundException, Session } from '@nestjs/common';
 import { userMock1 } from './user.entity.mock';
+import { BlockChainService } from 'src/blockchian.service';
+import { CryptoUtil } from 'src/utils/crypto.util';
 
 describe('UserController', () => {
   let controller: UserController;
   let fakeUserService: Partial<UserService>;
   let fakeAuthService: Partial<AuthService>;
+  let fakeBlockChainService: Partial<BlockChainService>;
+  let fakeCryptoUtil: Partial<CryptoUtil>;
 
   beforeEach(async () => {
 
@@ -41,7 +45,15 @@ describe('UserController', () => {
         {
           provide: AuthService,
           useValue: fakeAuthService,
-        }
+        },
+        {
+          provide: BlockChainService,
+          useValue: fakeBlockChainService,
+        },
+        {
+          provide: CryptoUtil,
+          useValue: fakeCryptoUtil,
+        },
       ]
     }).compile();
 

@@ -13,6 +13,45 @@ import { ObjectId } from 'mongodb';
 import { Contract, Web3BaseWalletAccount } from 'web3';
 import { ContractABI } from 'src/utils/smart-contract/contractABI';
 import { DateUtil } from 'src/utils/date.util';
+import { Badge } from 'src/badges/badges.entity';
+
+export interface BadgeFromDb extends Badge{
+  _id: ObjectId;
+}
+
+export interface BadgeRequireResult {
+  badgeName: string;
+  isExist: boolean;
+}
+
+type modifierCertificateForMint = {
+    certificates: [
+        {
+            _id: string;
+            name: string;
+            canMint?: boolean;
+            descriptionCourse: string;
+            earningCriteria: string;
+            templateCode: string;
+            linkCourse: string;
+            skill: string[];
+            expiration: {
+                year: number,
+                month: number,
+                day: number
+            },
+            imageInfo: {
+                imageURL: string;
+                mimeType: string;
+                originalFilename: string;
+            },
+            badgeRequired: BadgeFromDb[];
+            userId: string[];
+            badgeRequiredResult: BadgeRequireResult[];
+        }
+    ],
+    organizeName: string;
+}
 
 @Injectable()
 export class CertificatesService {
@@ -123,7 +162,8 @@ export class CertificatesService {
 
   async findCertificateUserCanMint(userPublickey: string) {
 
-    const certificateOfEachOrganize = this.certificateRepo.aggregate([
+    /* filter certificate and group it by organize */
+    let certificateOfEachOrganize = await this.certificateRepo.aggregate([
       {
        $group: {
         _id: '$organizeName',
@@ -136,15 +176,60 @@ export class CertificatesService {
         $unwind: '$certificates'
       },
       {
-        $unset: 'certificates.organizeName'
+        $unwind: '$certificates.badgeRequired'
+      },
+      {
+        $addFields: {
+          certificates : { badgeId: { '$toObjectId': "$certificates.badgeRequired" } }
+        }
+      },
+      {
+        $lookup: {
+          from: 'badge',
+          localField: 'certificates.badgeId',
+          foreignField: '_id',
+          as: 'certificates.badgeRequired'
+        }
+      },
+      {
+        $unset: [
+          'certificates.badgeId',
+          'certificates.badgeRequired.userId',
+          'certificates.userId',
+        ]
+      },
+      {
+        $unwind: '$certificates.badgeRequired'
       },
       {
         $group: {
-         _id: '$_id',
+         _id: '$certificates._id',
+         certificates: {
+           $first: '$certificates',
+         },
+         badgeRequired: {
+          $addToSet: '$certificates.badgeRequired'
+         }
+        } 
+      },
+      {
+        $addFields: {
+          certificates: { badgeRequired: '$badgeRequired' }
+        }
+      },
+      {
+        $unset: 'badgeRequired'
+      },
+      {
+        $group: {
+         _id: '$certificates.organizeName',
          certificates: {
            $push: '$certificates'
          }
         } 
+      },
+      {
+        $unset: 'certificates.organizeName'
       },
       {
         $addFields: {
@@ -156,14 +241,63 @@ export class CertificatesService {
           _id: 0
         }
       }
-    ]).toArray();
+    ]).toArray() as unknown as modifierCertificateForMint[];
 
-    console.log(userPublickey)
+    /* get user's badge from smart contract */
     const contract: Contract<ContractABI> = this.blockchainService.getSmartContract();
     const userPocketBadgeFromSmartContract: BadgeStructOutput[] = await contract.methods.getUserBadgePocket(userPublickey).call();
     const userPocketBadge: BadgeResp[] = await this.blockchainService.mappingBadgeFromSol(userPocketBadgeFromSmartContract); 
 
-    console.log(userPocketBadge);
+    /* filter expired badge out  */
+    const userPocketBadgeNotExpired: BadgeResp[] = userPocketBadge.filter( (userBadge) => userBadge.expireUnixTime > DateUtil.currentUnixTime() ); 
+
+    /* map which certificate user can mint from user's badge on smart contract */
+    userPocketBadgeNotExpired.forEach( (userBadge) => {
+      certificateOfEachOrganize = certificateOfEachOrganize.map((certificateEachOrganize) => {
+        
+        certificateEachOrganize.certificates.forEach((certificate) => {
+
+          // if it's undefined or null set it to empthy array
+          if(!certificate.badgeRequiredResult) {
+            certificate.badgeRequiredResult = [];
+          }
+
+          console.log(certificate.badgeRequired.map((badge) => badge._id.toString()))
+          const index = certificate.badgeRequired.map((badge) => badge._id.toString()).indexOf(userBadge.templateCode);
+          console.log(index);
+
+          if(index > -1 ) {
+            certificate.badgeRequiredResult.push({ badgeName: certificate.badgeRequired[index].name, isExist: true });
+            certificate.badgeRequired.splice(index, 1);
+          }
+
+        }) 
+
+        return certificateEachOrganize;
+      });
+    });
+
+    /* two thing to do here !!! */
+    /* check if badges required are empty it's mean canMint: true otherwise canMint: false */
+    /* add remaining badges in badgeRequired to badgeRequiredResult with isExist: false  */
+    certificateOfEachOrganize.forEach((certificateOfOrganize) => {
+      certificateOfOrganize.certificates.forEach( (certificate) => {
+
+        if(certificate.badgeRequired.length === 0) {
+          certificate.canMint = true;
+        }else{
+          certificate.badgeRequired.forEach( (badgeRemaining,index) => {
+            certificate.badgeRequiredResult.push({ badgeName: badgeRemaining.name, isExist: false });
+            certificate.badgeRequired.splice(index, 1);
+          })
+          certificate.canMint = false;
+        }
+
+        /* delete badgeRequired fields */
+        delete certificate.badgeRequired;
+
+      });
+    });
 
     return certificateOfEachOrganize;
   }

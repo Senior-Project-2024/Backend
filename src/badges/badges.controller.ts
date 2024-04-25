@@ -1,22 +1,18 @@
-import { BadRequestException, Body, Controller, Post, UseGuards, Get, Query, UseInterceptors, UploadedFile, Session, Param, Patch } from '@nestjs/common';
-import { CreateBadgeTemplateDto } from './dtos/create-badge-template.dto';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { OrganizeGuard } from 'src/guards/organize.guard';
 import { ThirdPartyGuard } from 'src/guards/third-party.guard';
 import { CurrentUser } from 'src/user/decorators/current-user.decorator';
-import { User } from 'src/user/user.entity';
-import { HostGuard } from 'src/guards/host.guard';
-import { BadgesService } from './badges.service';
-import { OrganizeGuard } from 'src/guards/organize.guard';
 import { UserRole } from 'src/user/user.constant';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { HttpService } from '@nestjs/axios';
-import { IAppSession } from 'src/utils/interfaces/app-session.interface';
+import { User } from 'src/user/user.entity';
+import { BadgesService } from './badges.service';
+import { CreateBadgeTemplateDto } from './dtos/create-badge-template.dto';
 
 @Controller('badges')
 export class BadgesController {
 
   constructor(
     private badgeService: BadgesService,
-    // private httpService: HttpService
   ){} 
 
   @Get('mint')

@@ -1,15 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadgesController } from './badges.controller';
 import { BadgesService } from './badges.service';
-import { BlockChainService } from 'src/blockchian.service';
-import { NFTStorageClientUtil } from 'src/utils/nft-storage.util';
-
+import { AuthService } from 'src/user/auth.service';
 
 describe('BadgesController', () => {
   let controller: BadgesController;
   let fakeBadgeService: Partial<BadgesService>;
-  let fakeBlockChainService: Partial<BlockChainService>;
-  let fakeNFTStorageClientUtil: Partial<NFTStorageClientUtil>;
+  let fakeAuthService: Partial<AuthService>;
 
   beforeEach(async () => {
 
@@ -18,11 +15,7 @@ describe('BadgesController', () => {
 
     };
 
-    fakeBlockChainService = {
-
-    };
-
-    fakeNFTStorageClientUtil = {
+    fakeAuthService = {
 
     };
 
@@ -34,12 +27,8 @@ describe('BadgesController', () => {
           useValue: fakeBadgeService
         },
         {
-          provide: BlockChainService,
-          useValue: fakeBlockChainService,
-        },
-        {
-          provide: NFTStorageClientUtil,
-          useValue: fakeNFTStorageClientUtil
+          provide: AuthService,
+          useValue: fakeAuthService
         }
       ]
     }).compile();
