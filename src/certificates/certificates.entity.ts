@@ -18,12 +18,6 @@ export class Certificate {
   earningCriteria: string;
 
   @Column()
-  templateCode: string;
-
-  @Column()
-  linkCourse: string
-
-  @Column()
   organizeName: string;
 
   @Column()

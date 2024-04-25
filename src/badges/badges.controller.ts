@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors, Delete } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { OrganizeGuard } from 'src/guards/organize.guard';
 import { ThirdPartyGuard } from 'src/guards/third-party.guard';
@@ -68,26 +68,20 @@ export class BadgesController {
     return this.badgeService.findAll();
   }
 
+  @Get('/organize/:id')
+  async getBadgeByOrgnizeId(@Param('id') id: string){
+    return this.badgeService.findByUserId(id)
+  }
+
+  @Delete('/:id')
+  async deleteBadge(@Param('id') id: string){
+    return this.badgeService.remove(id)
+  }
+
   @Get('/:id')
   async getBadgeById(@Param('id') id: string){
     return this.badgeService.findOne(id)
   }
-
-  // @Get('blob')
-  // async loadImage() {
-  //   const resp = await this.httpService.axiosRef.get(
-  //     `https://res.cloudinary.com/dreyhlhxu/image/upload/v1711221566/hfpltnjbuxc18zawhet3.png`,
-  //     {responseType: 'blob'}
-  //     )
-  //   console.log(resp.data);
-  // }
-
-  /* Our Problem */
-  // 1. user can call anytime if they know how to parse body
-
-  /*  Must think */
-  // 1. how to keep templateCode and any data when mintBadge
-
   
 
 }

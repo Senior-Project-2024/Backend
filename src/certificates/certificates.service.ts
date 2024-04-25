@@ -124,7 +124,57 @@ export class CertificatesService {
       return null;
     } 
 
-    return this.certificateRepo.find( { where: { userId } } );
+    return this.certificateRepo.find( { where: { userId: new ObjectId(userId) } } );
+  }
+
+  // findByUserId but add fullBadgeRequired
+  async findByUserIdWithBadgename(userId: string){
+    return this.certificateRepo.aggregate([
+      {
+        $match : {
+          userId : new ObjectId(userId)
+        }
+      },
+      {
+        $unwind: '$badgeRequired'
+      },
+      {
+        $addFields: {
+          badgeRequiredTemp: { $toObjectId: '$badgeRequired'}
+        }
+      },
+      {
+        $lookup : {
+          from: "badge",
+          localField: "badgeRequiredTemp",
+          foreignField: "_id",
+          as: "MovieDetails",
+        }
+      },
+      {
+        $group : { 
+          _id : "$_id",
+          fullBadgeRequire : { $push : {$arrayElemAt: [ "$MovieDetails", 0 ]}},
+          doc : { $first :"$$ROOT"}
+        }
+      },
+      {
+        $addFields: {
+          "doc.fullBadgeRequire" : '$fullBadgeRequire'
+        }
+      },
+      {
+        $replaceRoot: {
+          newRoot: '$doc'
+        }
+      },
+      {
+        $unset: [
+          "MovieDetails"
+        ]
+        
+      }
+    ]).toArray()
   }
 
   async update(id: string, attrs: Partial<Certificate>): Promise<Certificate> {
