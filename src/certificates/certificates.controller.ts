@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Param, Get, Patch, Post, UploadedFile, UseGuards, UseInterceptors, Session, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Param, Get, Patch, Post, UploadedFile, UseGuards, UseInterceptors, Session, Query, Delete } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { OrganizeGuard } from 'src/guards/organize.guard';
 import { CurrentUser } from 'src/user/decorators/current-user.decorator';
@@ -77,14 +77,19 @@ export default class CertificatesController {
   async findByUserIdWithBadgename(@Param('id') id: string){
     return this.certificateService.findByUserIdWithBadgename(id)
   }
+
+  @Delete('/:id')
+  async deleteCertificate(@Param('id') id: string){
+    return this.certificateService.remove(id);
+  }
   
   // @Get('all')
   // async getAllBadges(){
   //   return this.certificateService.findAll();
   // }
 
-  // @Get('/:id')
-  // async getBadgeById(@Param('id') id: string){
-  //   return this.certificateService.findOne(id)
-  // }
+  @Get('/:id')
+  async getCertificateById(@Param('id') id: string){
+    return this.certificateService.findOne(id)
+  }
 } 

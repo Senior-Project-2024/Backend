@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Post, UseGuards, Get, Query, UseInterceptors, UploadedFile, Session, Param, Patch } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Post, UseGuards, Get, Query, UseInterceptors, UploadedFile, Session, Param, Patch, Delete } from '@nestjs/common';
 import { CreateBadgeTemplateDto } from './dtos/create-badge-template.dto';
 import { ThirdPartyGuard } from 'src/guards/third-party.guard';
 import { CurrentUser } from 'src/user/decorators/current-user.decorator';
@@ -75,6 +75,11 @@ export class BadgesController {
   @Get('/organize/:id')
   async getBadgeByOrgnizeId(@Param('id') id: string){
     return this.badgeService.findByUserId(id)
+  }
+
+  @Delete('/:id')
+  async deleteBadge(@Param('id') id: string){
+    return this.badgeService.remove(id)
   }
 
   @Get('/:id')
