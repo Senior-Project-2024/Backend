@@ -1,3 +1,4 @@
+import { CertificatesModule } from './../certificates/certificates.module';
 import { Module } from '@nestjs/common';
 import { BadgesController } from './badges.controller';
 import { BadgesService } from './badges.service';
@@ -12,6 +13,7 @@ import { NFTStorageClientUtil } from 'src/utils/nft-storage.util';
 @Module({
   imports: [UserModule, TypeOrmModule.forFeature([Badge]), CloudinaryModule, HttpModule],
   controllers: [BadgesController],
-  providers: [BadgesService, BlockChainService, NFTStorageClientUtil]
+  providers: [BadgesService, BlockChainService, NFTStorageClientUtil],
+  exports: [BadgesService]
 })
 export class BadgesModule {}

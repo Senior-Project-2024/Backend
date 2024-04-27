@@ -12,6 +12,7 @@ import { NFTStorageClientUtil } from 'src/utils/nft-storage.util';
 @Module({
   imports: [UserModule, TypeOrmModule.forFeature([Certificate]), HttpModule, CloudinaryModule],
   controllers: [CertificatesController],
-  providers: [CertificatesService, BlockChainService, NFTStorageClientUtil]
+  providers: [CertificatesService, BlockChainService, NFTStorageClientUtil],
+  exports: [CertificatesService]
 })
 export class CertificatesModule {}

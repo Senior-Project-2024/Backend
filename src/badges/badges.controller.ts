@@ -82,6 +82,5 @@ export class BadgesController {
   async getBadgeById(@Param('id') id: string){
     return this.badgeService.findOne(id)
   }
-  
 
 }

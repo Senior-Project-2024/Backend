@@ -50,4 +50,8 @@ export class DateUtil {
     return true;
   }
 
+  static unixToDate(unix: bigint): Date {
+    return new Date(Number(unix) * 1000); 
+  }
+
 }
