@@ -127,6 +127,59 @@ export class CertificatesService {
     return this.certificateRepo.find( { where: { userId: new ObjectId(userId) } } );
   }
 
+  async findWithIdAndLinkCollection(id: string): Promise<Certificate> {
+    const certificateRepo: Certificate[] = await this.certificateRepo.aggregate([
+      {
+        $match: { _id: new ObjectId(id)}
+      },
+      {
+        $unwind: '$badgeRequired'
+      },
+      {
+        $addFields: {
+          badgeId: { $toObjectId: '$badgeRequired'}
+        }
+      },
+      {
+        $lookup: {
+          from: 'badge',
+          localField: 'badgeId',
+          foreignField: '_id',
+          as: 'badgeRequired'
+        }
+      },
+      {
+        $unset: 'badgeId'
+      },
+      {
+        $unwind: '$badgeRequired'
+      },
+      {
+        $group: {
+          _id: '$_id',
+          certificates: {
+            $first: '$$ROOT'
+          },
+          badgeRequired: {
+            $push: '$badgeRequired'
+          }
+        }
+      },
+      {
+        $addFields: {
+          certificates: { badgeRequired: '$badgeRequired' },
+        }
+      },
+      {
+        $replaceRoot: {
+          newRoot: '$certificates',
+        }
+      }
+    ]).toArray();
+
+    return certificateRepo[0];
+  }
+
   // findByUserId but add fullBadgeRequired
   async findByUserIdWithBadgename(userId: string){
     return this.certificateRepo.aggregate([
@@ -376,7 +429,7 @@ export class CertificatesService {
     /* because smart contract use unix time */
 
     const userCertificate = {
-      issuedBy: certificateTemplate.name,
+      issuedBy: certificateTemplate.organizeName,
       issueUnixTime: DateUtil.millisecToUnix(startMillisecs),
       expireUnixTime: DateUtil.millisecToUnix(expireMillisecs),
       templateCode,

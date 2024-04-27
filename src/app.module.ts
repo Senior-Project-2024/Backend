@@ -11,6 +11,7 @@ import { CertificatesModule } from './certificates/certificates.module';
 import { Badge } from './badges/badges.entity';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { Certificate } from './certificates/certificates.entity';
+import { BlockChainService } from './blockchian.service';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -44,7 +45,8 @@ const cookieSession = require('cookie-session');
       useValue: new ValidationPipe({
         whitelist: true,
       }),
-    }
+    },
+    BlockChainService
   ],
 })
 export class AppModule {

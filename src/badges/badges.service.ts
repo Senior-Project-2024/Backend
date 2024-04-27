@@ -147,7 +147,7 @@ export class BadgesService {
 
     /* create user badge for minting and store it on our smart contracts  */
     const userBadge = { 
-      issuedBy: badgeTemplate.name,
+      issuedBy: badgeTemplate.organizeName,
       issueUnixTime: DateUtil.millisecToUnix(startMillisecs),
       expireUnixTime: DateUtil.millisecToUnix(expireMillisecs),
       templateCode,

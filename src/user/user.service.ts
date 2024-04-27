@@ -87,7 +87,11 @@ export class UserService {
 
     return user;
   }
-  
+
+  async findByPublicKey(publickey: string) {
+    return this.userRepo.find({ where: { 'keyStoreJsonV3.address': publickey.toLowerCase()  }});
+  }
+   
   async findHashCodeAndUpdateIsConfirm(hashCode : string){
 
     const user = await this.userRepo.find({where : {hashCode}})
