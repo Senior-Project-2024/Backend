@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ObjectId } from 'mongodb';
-import { BlockChainService } from 'src/blockchian.service';
+import { BadgeResp, BadgeStructOutput, BlockChainService } from 'src/blockchian.service';
 import { CloudinaryResponse } from 'src/cloudinary/cloudinary-response';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { DateUtil } from 'src/utils/date.util';
@@ -182,6 +182,33 @@ export class BadgesService {
     /* remove server account from wallet of provider */
     this.blockchainService.removeServerWalletForSignTransaction();
   
+  }
+
+  async getAllBadge(userPublicKey: string ){
+    const contract : Contract<ContractABI> = this.blockchainService.getSmartContract();
+    const userPocketBadgeFromSmartContract = await contract.methods.getUserBadgePocket(userPublicKey).call()
+    const userPocketBadge: BadgeResp[] = await this.blockchainService.mappingBadgeFromSol(userPocketBadgeFromSmartContract); 
+    
+    /* filter expired badge out  */
+    const userPocketBadgeNotExpired: BadgeResp[] = userPocketBadge.filter( (userBadge) => userBadge.expireUnixTime > DateUtil.currentUnixTime() )
+    console.log(userPocketBadgeNotExpired)
+    
+    /* Add data from DB w/templateCode */
+    const userPocketBadgeNotExpiredMapData = await Promise.all(userPocketBadgeNotExpired.map( async (userBadge)=>{
+      const templateBadgeData : Badge = await this.findOne(userBadge.templateCode)
+      return {
+        ...templateBadgeData,
+        id : userBadge.id,
+        issuedBy : userBadge.issuedBy,
+        evidenceURL : userBadge.evidenceURL,
+      }
+    }))
+
+    /* categorize Organization */
+
+
+
+    return { pass : "abc"}
   }
 
 }

@@ -7,6 +7,7 @@ import { UserRole } from 'src/user/user.constant';
 import { User } from 'src/user/user.entity';
 import { BadgesService } from './badges.service';
 import { CreateBadgeTemplateDto } from './dtos/create-badge-template.dto';
+import { BlockChainService } from 'src/blockchian.service';
 
 @Controller('badges')
 export class BadgesController {
@@ -23,6 +24,13 @@ export class BadgesController {
     @Query('evidenceURL') evidenceURL: string,
   ) {
     return this.badgeService.mintBadge(publicKey, templateCode, evidenceURL);
+  }
+  
+  @Get('getAllBadge')
+  thirdPartyGetBadge(
+    @Query('publickey') publickKey : string
+  ){
+    return this.badgeService.getAllBadge(publickKey);
   }
 
   @Post('')
