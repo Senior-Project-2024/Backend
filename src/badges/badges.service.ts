@@ -13,11 +13,13 @@ import { Contract, Web3BaseWalletAccount } from 'web3';
 import { Badge } from './badges.entity';
 import { CreateBadgeTemplateDto } from './dtos/create-badge-template.dto';
 import { ImageDto } from 'src/dtos/image.dto';
+import { UserService } from 'src/user/user.service';
 
 @Injectable() 
 export class BadgesService {
 
   constructor(
+    private userService: UserService,
     private blockchainService: BlockChainService,
     private cloudinaryService: CloudinaryService,
     private httpService: HttpService,
@@ -184,14 +186,13 @@ export class BadgesService {
   
   }
 
-  async getAllBadge(userPublicKey: string ){
+  async getAllBadgeUser(userPublicKey: string ){
     const contract : Contract<ContractABI> = this.blockchainService.getSmartContract();
     const userPocketBadgeFromSmartContract = await contract.methods.getUserBadgePocket(userPublicKey).call()
     const userPocketBadge: BadgeResp[] = await this.blockchainService.mappingBadgeFromSol(userPocketBadgeFromSmartContract); 
     
     /* filter expired badge out  */
-    const userPocketBadgeNotExpired: BadgeResp[] = userPocketBadge.filter( (userBadge) => userBadge.expireUnixTime > DateUtil.currentUnixTime() )
-    console.log(userPocketBadgeNotExpired)
+    const userPocketBadgeNotExpired: BadgeResp[] = userPocketBadge.filter( (userBadge) => (userBadge.expireUnixTime > DateUtil.currentUnixTime() || Number(userBadge.expireUnixTime) === 0 ) )
     
     /* Add data from DB w/templateCode */
     const userPocketBadgeNotExpiredMapData = await Promise.all(userPocketBadgeNotExpired.map( async (userBadge)=>{
@@ -201,14 +202,73 @@ export class BadgesService {
         id : userBadge.id,
         issuedBy : userBadge.issuedBy,
         evidenceURL : userBadge.evidenceURL,
+        issuedDate : DateUtil.unixToDateString(Number(userBadge.issueUnixTime)),
+        expireDate : userBadge.expireUnixTime > 0 ? DateUtil.unixToDateString(Number(userBadge.expireUnixTime)) : "none",
       }
     }))
 
     /* categorize Organization */
+    const userPocketBadgeNotExpiredMapDataCategorize = [];
 
+    userPocketBadgeNotExpiredMapData.forEach((badgeMapData)=>{
+      const legnth : number = userPocketBadgeNotExpiredMapDataCategorize.length
+      let isfound : boolean = false;
+      let i = 0;
+      while( (i < legnth) && !isfound) {
+        if(badgeMapData.issuedBy === userPocketBadgeNotExpiredMapDataCategorize[i][0].issuedBy){
+          userPocketBadgeNotExpiredMapDataCategorize[i].push(badgeMapData)
+          isfound = true;
+        }
+        i++;
+      }
+      if(isfound === false){
+        userPocketBadgeNotExpiredMapDataCategorize.push([badgeMapData])
+      }
+    })
 
+    console.log(userPocketBadgeNotExpiredMapDataCategorize);
 
-    return { pass : "abc"}
+    return userPocketBadgeNotExpiredMapDataCategorize
+  }
+
+  async getSpecificBadgeUser(id : string){
+    const contract : Contract<ContractABI> = this.blockchainService.getSmartContract();
+    let addressFromId : string 
+    try{
+      addressFromId = await contract.methods.ownerOf(id).call()
+    }catch(error){
+      throw new NotFoundException(error);
+    }
+    
+    const userPocketBadgeFromSmartContract = await contract.methods.getUserBadgePocket(addressFromId).call()
+    const userPocketBadge: BadgeResp[] = await this.blockchainService.mappingBadgeFromSol(userPocketBadgeFromSmartContract); 
+    
+    /* Find Id from userPocketBadge */
+    const userPocketBadgeWithId = userPocketBadge.filter((userBadge)=>{
+      return userBadge.id.toString() === id;
+    })
+    
+    /* Get badgeTemplete */
+    const badgeTemplateDB : Badge = await this.findOne(userPocketBadgeWithId[0].templateCode)
+
+    /* Get User from DB */
+    const userDetail = await this.userService.findByPublicKey(addressFromId.slice(2))
+
+    if(userDetail.length === 0){
+      throw new NotFoundException('user not found!');
+    }
+
+    return {
+      ...badgeTemplateDB,
+      id : userPocketBadgeWithId[0].id,
+      issuedBy : userPocketBadgeWithId[0].issuedBy,
+      evidenceURL : userPocketBadgeWithId[0].evidenceURL,
+      issuedDate : DateUtil.unixToDateString(Number(userPocketBadgeWithId[0].issueUnixTime)),
+      expireDate : userPocketBadgeWithId[0].expireUnixTime > 0 ? DateUtil.unixToDateString(Number(userPocketBadgeWithId[0].expireUnixTime)) : "none",
+      firstName : userDetail[0].fName,
+      lastName : userDetail[0].lName
+    }
+    
   }
 
 }

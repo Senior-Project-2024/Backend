@@ -54,4 +54,46 @@ export class DateUtil {
     return new Date(Number(unix) * 1000); 
   }
 
+  static numberMonthToFullMonth(monthNumber : number) : string{
+    if(monthNumber === 0)
+      return "January"
+    else if(monthNumber === 1)
+      return "February"
+    else if(monthNumber === 2)
+      return "March"
+    else if(monthNumber === 3)
+      return "April"
+    else if(monthNumber === 4)
+      return "May"
+    else if(monthNumber === 5)
+      return "June"
+    else if(monthNumber === 6)
+      return "July"
+    else if(monthNumber === 7)
+      return "August"
+    else if(monthNumber === 8)
+      return "September"
+    else if(monthNumber === 9)
+      return "October"
+    else if(monthNumber === 10)
+      return "November"
+    else if(monthNumber === 11)
+      return "December"
+    return "Can not find"
+    
+  }
+
+  static unixToDateString(unix: number) : string{
+    const date : Date = new Date(this.unixToMillisec(unix));
+
+    const year : number = date.getFullYear();
+    const month : number = date.getMonth();
+    // transform month to fullmonth
+    const fullMonth : string = this.numberMonthToFullMonth(month);
+    const day : number = date.getDate();
+    
+    return `${day} ${fullMonth} ${year}`
+
+  }
+
 }

@@ -26,11 +26,18 @@ export class BadgesController {
     return this.badgeService.mintBadge(publicKey, templateCode, evidenceURL);
   }
   
-  @Get('getAllBadge')
+  @Get('getAllBadgeUser')
   thirdPartyGetBadge(
     @Query('publickey') publickKey : string
   ){
-    return this.badgeService.getAllBadge(publickKey);
+    return this.badgeService.getAllBadgeUser(publickKey);
+  }
+
+  @Get('getSpecificBadgeUser')
+  getSpecificBadgeUser(
+    @Query('id') id : string
+  ){
+    return this.badgeService.getSpecificBadgeUser(id);
   }
 
   @Post('')
