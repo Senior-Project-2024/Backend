@@ -1,14 +1,14 @@
-import { Expose, Type } from "class-transformer"
-import { UserSignInRespDto } from "./user-sign-in-resp.dto"
+import { Expose, Type } from "class-transformer";
+import { UserInSessionDto } from './user-in-session.dto';
 
 export class UserSessionDto {
 
   @Expose()
-  @Type(() => UserSignInRespDto)
-  user: UserSignInRespDto;
+  @Type(() => UserInSessionDto)
+  user: UserInSessionDto;
 
   @Expose()
-  @Type(() => UserSignInRespDto)
-  organize: UserSignInRespDto;
+  @Type(() => UserInSessionDto)
+  organize: UserInSessionDto;
 
 } 

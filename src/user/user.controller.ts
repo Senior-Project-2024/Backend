@@ -112,6 +112,8 @@ export class UserController {
   @Get('/whoAmI')
   @Serialize(UserSessionDto)
   getCurrentUser(@CurrentUser() user: User, @CurrentUser(UserRole.organization,) organize: User) {
+    console.log(user);
+    console.log(organize);
     return { user, organize };
   }
 
