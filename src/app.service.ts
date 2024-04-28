@@ -36,7 +36,7 @@ export class AppService {
     const address: string = await contract.methods.ownerOf(tokenId).call();
 
     if(!address) {
-      throw new NotFoundException('Token ID not found!.');
+      throw new NotFoundException('Token Id not found!.');
     }
     
     const user: User = (await this.userService.findByPublicKey(address.slice(2)))[0];
@@ -76,7 +76,7 @@ export class AppService {
       let expireDateConverter: string[];
 
       if( Number(tokenResult.expireUnixTime) !== 0 ) {
-        expireDateConverter = DateUtil.unixToDate(tokenResult.expireUnixTime).toUTCString().split(' ');
+        expireDateConverter = DateUtil.unixToDate(tokenResult.expireUnixTime).toUTCString().split(' '); // dd mm yy
       }
       console.log('here')
       

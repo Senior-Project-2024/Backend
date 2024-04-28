@@ -236,21 +236,6 @@ export class AuthService {
     }
   }
 
-  loginForm(redirectURL: string) {
-    return `
-    <form action="./thirdParty?redirectURL=${redirectURL}" method="POST">
-      <div>
-        <label>Email</label>
-        <input name="email" />
-      </div>
-      <div>
-        <label>Password</label>
-        <input name="password" type="password"/> 
-      </div>
-      <button>submit</button>
-    </form>`
-  }
-
   async checkPasswordMatch(passwordFromRequest: string, passwordFromDb: string) {
 
     // get salt from db 

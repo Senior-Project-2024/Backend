@@ -15,16 +15,6 @@ export default class CertificatesController {
     private certificateService: CertificatesService
   ) {} 
 
-  // @Get('mint')
-  // @UseGuards(ThirdPartyGuard)
-  // mintBadge(
-  //   @Query('publickey') publicKey: string, 
-  //   @Query('templateCode') templateCode: string,
-  //   @Query('evidenceURL') evidenceURL: string,
-  // ) {
-  //   return this.certificateService.mintBadge(publicKey, templateCode, evidenceURL);
-  // }
-
   @Post('')
   @UseGuards(OrganizeGuard)
   @UseInterceptors(FileInterceptor('image'))
