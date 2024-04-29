@@ -83,10 +83,6 @@ export class BadgesService {
 
     return this.badgeRepo.find( { where: { userId: new ObjectId(userId) } } );
   }
-  
-  async findByTemplateCode(templateCode: string): Promise<Badge> {
-    return this.badgeRepo.findOneBy({ templateCode });
-  }
 
   async update(id: string, attrs: Partial<Badge>) {
     const badge = await this.findOne(id);

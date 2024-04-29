@@ -1,16 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ContractABI, contractABI } from 'src/utils/smart-contract/contractABI';
 import { Contract, KeyStore, Web3BaseWalletAccount } from 'web3';
 import { Web3Account } from 'web3-eth-accounts';
-import { Badge } from './badges/badges.entity';
-import { BadgesService } from './badges/badges.service';
-import { Certificate } from './certificates/certificates.entity';
-import { CertificatesService } from './certificates/certificates.service';
 import { Web3App } from './utils/web3.util';
-import { DateUtil } from './utils/date.util';
-import { UserService } from './user/user.service';
-import { User } from './user/user.entity';
 
 export type BadgeResp = {
   id: number;
