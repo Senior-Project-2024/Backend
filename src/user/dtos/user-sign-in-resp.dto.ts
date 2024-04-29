@@ -26,6 +26,7 @@ export class UserSignInRespDto{
   @Expose()
   telNo: string;
 
+  @Expose()
   keyStoreJsonV3: KeyStore;
 
   @Expose()
