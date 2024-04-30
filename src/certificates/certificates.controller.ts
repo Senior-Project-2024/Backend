@@ -15,6 +15,14 @@ export default class CertificatesController {
     private certificateService: CertificatesService
   ) {} 
 
+  @Get('mint')
+  mintBadge(
+    @Query('publickey') publicKey: string, 
+    @Query('templateCode') templateCode: string,
+  ) {
+    return this.certificateService.mintCertificate(publicKey, templateCode);
+  }
+
   @Post('')
   @UseGuards(OrganizeGuard)
   @UseInterceptors(FileInterceptor('image'))
@@ -53,6 +61,20 @@ export default class CertificatesController {
   
     }
 
+    @Get('getAllCertificateUser')
+    thirdPartyGetCertificate(
+      @Query('publickey') publickKey : string
+    ){
+      return this.certificateService.getAllCerificateUser(publickKey);
+    }
+  
+    @Get('getSpecificCertificateUser')
+    getSpecificCertificateUser(
+      @Query('id') id : string
+    ){
+      return this.certificateService.getSpecificCertificateUser(id);
+    }
+
   @Get('organize')
   async getBadgeByOrganize(@Query('publickey') userPublickey : string){
     return this.certificateService.findCertificateUserCanMint(userPublickey);
@@ -82,4 +104,5 @@ export default class CertificatesController {
   async getCertificateById(@Param('id') id: string){
     return this.certificateService.findOne(id)
   }
+
 } 

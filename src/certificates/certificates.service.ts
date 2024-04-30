@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BadgeResp, BlockChainService, BadgeStructOutput } from 'src/blockchian.service';
+import { BadgeResp, BlockChainService, BadgeStructOutput, CertifcateResp } from 'src/blockchian.service';
 import { CloudinaryResponse } from 'src/cloudinary/cloudinary-response';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { ImageDto } from 'src/dtos/image.dto';
@@ -14,6 +14,7 @@ import { Contract, Web3BaseWalletAccount } from 'web3';
 import { ContractABI } from 'src/utils/smart-contract/contractABI';
 import { DateUtil } from 'src/utils/date.util';
 import { Badge } from 'src/badges/badges.entity';
+import { UserService } from 'src/user/user.service';
 
 export interface BadgeFromDb extends Badge{
   _id: ObjectId;
@@ -57,6 +58,7 @@ type modifierCertificateForMint = {
 export class CertificatesService {
   
   constructor(
+    private userService: UserService,
     private blockchainService: BlockChainService,
     private nftStorageClientUtils: NFTStorageClientUtil,
     private httpService: HttpService,
@@ -465,4 +467,89 @@ export class CertificatesService {
     /* remove server account from wallet of provider */
     this.blockchainService.removeServerWalletForSignTransaction();
   }
+
+  async getAllCerificateUser(userPublicKey: string ){
+    const contract : Contract<ContractABI> = this.blockchainService.getSmartContract();
+    const userPocketCertificateFromSmartContract = await contract.methods.getUserCertificatePocket(userPublicKey).call()
+    const userPocketCertificate: CertifcateResp[] = await this.blockchainService.mappingCertificateFromSol(userPocketCertificateFromSmartContract); 
+    
+    /* filter expired Certificate out  */
+    const userPocketCertificateNotExpired: CertifcateResp[] = userPocketCertificate.filter( (userCertificate) => (userCertificate.expireUnixTime > DateUtil.currentUnixTime() || Number(userCertificate.expireUnixTime) === 0 ) )
+    
+    console.log(userPocketCertificateNotExpired)
+    /* Add data from DB w/templateCode */
+    const userPocketCertificateNotExpiredMapData = await Promise.all(userPocketCertificateNotExpired.map( async (userCertificate)=>{
+      const templateCertificateData : Certificate = await this.findOne(userCertificate.templateCode)
+      return {
+        ...templateCertificateData,
+        id : userCertificate.id,
+        issuedBy : userCertificate.issuedBy,
+        issuedDate : DateUtil.unixToDateString(Number(userCertificate.issueUnixTime)),
+        expireDate : userCertificate.expireUnixTime > 0 ? DateUtil.unixToDateString(Number(userCertificate.expireUnixTime)) : "none",
+      }
+    }))
+
+    /* categorize Organization */
+    const userPocketCertificateNotExpiredMapDataCategorize = [];
+
+    userPocketCertificateNotExpiredMapData.forEach((CertificateMapData)=>{
+      const legnth : number = userPocketCertificateNotExpiredMapDataCategorize.length
+      let isfound : boolean = false;
+      let i = 0;
+      while( (i < legnth) && !isfound) {
+        if(CertificateMapData.issuedBy === userPocketCertificateNotExpiredMapDataCategorize[i][0].issuedBy){
+          userPocketCertificateNotExpiredMapDataCategorize[i].push(CertificateMapData)
+          isfound = true;
+        }
+        i++;
+      }
+      if(isfound === false){
+        userPocketCertificateNotExpiredMapDataCategorize.push([CertificateMapData])
+      }
+    })
+
+    console.log(userPocketCertificateNotExpiredMapDataCategorize);
+
+    return userPocketCertificateNotExpiredMapDataCategorize
+  }
+
+  async getSpecificCertificateUser(id : string){
+    const contract : Contract<ContractABI> = this.blockchainService.getSmartContract();
+    let addressFromId : string 
+    try{
+      addressFromId = await contract.methods.ownerOf(id).call()
+    }catch(error){
+      throw new NotFoundException(error);
+    }
+    
+    const userPocketCertificateFromSmartContract = await contract.methods.getUserCertificatePocket(addressFromId).call()
+    const userPocketCertificate: CertifcateResp[] = await this.blockchainService.mappingCertificateFromSol(userPocketCertificateFromSmartContract); 
+    
+    /* Find Id from userPocketCertificate */
+    const userPocketCertificateWithId = userPocketCertificate.filter((userCertificate)=>{
+      return userCertificate.id.toString() === id;
+    })
+    
+    /* Get CertificateTemplete */
+    const ceritificateTemplateDB : Certificate = await this.findOne(userPocketCertificateWithId[0].templateCode)
+
+    /* Get User from DB */
+    const userDetail = await this.userService.findByPublicKey(addressFromId.slice(2))
+
+    if(userDetail.length === 0){
+      throw new NotFoundException('user not found!');
+    }
+
+    return {
+      ...ceritificateTemplateDB,
+      id : userPocketCertificateWithId[0].id,
+      issuedBy : userPocketCertificateWithId[0].issuedBy,
+      issuedDate : DateUtil.unixToDateString(Number(userPocketCertificateWithId[0].issueUnixTime)),
+      expireDate : userPocketCertificateWithId[0].expireUnixTime > 0 ? DateUtil.unixToDateString(Number(userPocketCertificateWithId[0].expireUnixTime)) : "none",
+      firstName : userDetail[0].fName,
+      lastName : userDetail[0].lName
+    }
+    
+  }
 }
+
