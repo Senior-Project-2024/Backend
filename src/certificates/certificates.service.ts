@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BadgeResp, BlockChainService, BadgeStructOutput } from 'src/blockchian.service';
+import { BadgeResp, BlockChainService, BadgeStructOutput, CertifcateResp, CertificateStructOutput } from 'src/blockchian.service';
 import { CloudinaryResponse } from 'src/cloudinary/cloudinary-response';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { ImageDto } from 'src/dtos/image.dto';
@@ -352,7 +352,7 @@ export class CertificatesService {
     const userPocketBadge: BadgeResp[] = await this.blockchainService.mappingBadgeFromSol(userPocketBadgeFromSmartContract); 
 
     /* filter expired badge out  */
-    const userPocketBadgeNotExpired: BadgeResp[] = userPocketBadge.filter( (userBadge) => userBadge.expireUnixTime > DateUtil.currentUnixTime() ); 
+    const userPocketBadgeNotExpired: BadgeResp[] = userPocketBadge.filter( (userBadge) => (userBadge.expireUnixTime > DateUtil.currentUnixTime() || userBadge.expireUnixTime == BigInt(0)) ); 
 
     /* map which certificate user can mint from user's badge on smart contract */
     userPocketBadgeNotExpired.forEach( (userBadge) => {
@@ -380,13 +380,20 @@ export class CertificatesService {
       });
     });
 
-    /* two thing to do here !!! */
+    /* === stage : check certificate from smart contract */
+    const userPocketCertificateFromSmartContract: CertificateStructOutput[] = await contract.methods.getUserCertificatePocket(userPublickey).call();
+    const userPocketCertificate: CertifcateResp[] = await this.blockchainService.mappingCertificateFromSol(userPocketCertificateFromSmartContract); 
+    
+    const userPocketCertificateNotExpired: CertifcateResp[] = userPocketCertificate.filter( (certificate) => (certificate.expireUnixTime > DateUtil.currentUnixTime() || certificate.expireUnixTime == BigInt(0)));
+    const userCerTemplateCodeNotExpired: string[] = userPocketCertificateNotExpired.map( (certificateNotExpired) => certificateNotExpired.templateCode );
+
+    /* === stage : two thing to do here !!! */
     /* check if badges required are empty it's mean canMint: true otherwise canMint: false */
     /* add remaining badges in badgeRequired to badgeRequiredResult with isExist: false  */
     certificateOfEachOrganize.forEach((certificateOfOrganize) => {
       certificateOfOrganize.certificates.forEach( (certificate) => {
 
-        if(certificate.badgeRequired.length === 0) {
+        if(certificate.badgeRequired.length === 0 && userCerTemplateCodeNotExpired.indexOf(certificate._id.toString()) === -1 ) {
           certificate.canMint = true;
         }else{
           certificate.badgeRequired.forEach( (badgeRemaining,index) => {
@@ -419,12 +426,20 @@ export class CertificatesService {
 
     /* create start and expire time in unix */
     const startMillisecs: number = Date.now();
-    const expireMillisecs: number = DateUtil.addCurrentDateWithYMDInMillisecs
-    (
-      certificateTemplate.expiration.year,
-      certificateTemplate.expiration.month,
-      certificateTemplate.expiration.day
-    );
+    let expireMillisecs: number = 0;
+
+    if(
+      certificateTemplate.expiration.year > 0 ||
+      certificateTemplate.expiration.month > 0 ||
+      certificateTemplate.expiration.day > 0
+    ) {
+      expireMillisecs = DateUtil.addCurrentDateWithYMDInMillisecs
+      (
+        certificateTemplate.expiration.year,
+        certificateTemplate.expiration.month,
+        certificateTemplate.expiration.day
+      );
+    }
     /* warn! convert to unix before send to smart contract */
     /* because smart contract use unix time */
 

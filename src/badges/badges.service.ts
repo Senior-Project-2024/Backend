@@ -134,12 +134,20 @@ export class BadgesService {
     const badgeTemplate: Badge = await this.findOne(templateCode);
 
     const startMillisecs: number = Date.now();
-    const expireMillisecs: number = DateUtil.addCurrentDateWithYMDInMillisecs
-    (
-      badgeTemplate.expiration.year,
-      badgeTemplate.expiration.month,
-      badgeTemplate.expiration.day
-    );
+    let expireMillisecs: number = 0;
+
+    if(
+      badgeTemplate.expiration.year > 0 ||
+      badgeTemplate.expiration.month > 0 ||
+      badgeTemplate.expiration.day > 0
+    ) {
+      expireMillisecs = DateUtil.addCurrentDateWithYMDInMillisecs
+      (
+        badgeTemplate.expiration.year,
+        badgeTemplate.expiration.month,
+        badgeTemplate.expiration.day
+      );
+    }
     /* warn! convert to unix before send to smart contract */
     /* because smart contract use unix time */
 
