@@ -365,9 +365,7 @@ export class CertificatesService {
             certificate.badgeRequiredResult = [];
           }
 
-          console.log(certificate.badgeRequired.map((badge) => badge._id.toString()))
           const index = certificate.badgeRequired.map((badge) => badge._id.toString()).indexOf(userBadge.templateCode);
-          console.log(index);
 
           if(index > -1 ) {
             certificate.badgeRequiredResult.push({ badgeName: certificate.badgeRequired[index].name, isExist: true });
@@ -390,12 +388,20 @@ export class CertificatesService {
     /* === stage : two thing to do here !!! */
     /* check if badges required are empty it's mean canMint: true otherwise canMint: false */
     /* add remaining badges in badgeRequired to badgeRequiredResult with isExist: false  */
+
     certificateOfEachOrganize.forEach((certificateOfOrganize) => {
-      certificateOfOrganize.certificates.forEach( (certificate) => {
+
+      let certificateUserOwned: number[] = [];
+
+      certificateOfOrganize.certificates.forEach( (certificate, index) => {
 
         if(certificate.badgeRequired.length === 0 && userCerTemplateCodeNotExpired.indexOf(certificate._id.toString()) === -1 ) {
           certificate.canMint = true;
-        }else{
+        }
+        else if(userCerTemplateCodeNotExpired.indexOf(certificate._id.toString()) !== -1) {
+          certificateUserOwned.push(index);
+        }
+        else{
           certificate.badgeRequired.forEach( (badgeRemaining,index) => {
             certificate.badgeRequiredResult.push({ badgeName: badgeRemaining.name, isExist: false });
             certificate.badgeRequired.splice(index, 1);
@@ -407,6 +413,13 @@ export class CertificatesService {
         delete certificate.badgeRequired;
 
       });
+
+      if( certificateUserOwned.length > 0 ) {
+        for(let i = 0; i < certificateUserOwned.length; i++) {
+          certificateOfOrganize.certificates.splice(certificateUserOwned[i], 1);
+        } 
+      }
+
     });
 
     return certificateOfEachOrganize;
