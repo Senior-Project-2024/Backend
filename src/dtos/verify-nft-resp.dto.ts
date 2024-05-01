@@ -1,4 +1,5 @@
 import { Expose } from "class-transformer";
+import { ImageDto } from "./image.dto";
 
  
 export class VerifyNFTResp {
@@ -26,6 +27,9 @@ export class VerifyNFTResp {
 
   @Expose()
   earningCriteria: string;
+
+  @Expose()
+  imageInfo: ImageDto;
 
   @Expose()
   skill: string[];
