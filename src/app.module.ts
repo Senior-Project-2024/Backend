@@ -55,8 +55,8 @@ export class AppModule {
       cookieSession({
         keys: ['asdasdasd'],
         sameSite: 'lax',
-        secure: false,
-        domain: 'localhost' 
+        secure: true,
+        domain: 'proveself.me' 
       })
     )
     .forRoutes('*');
