@@ -82,7 +82,7 @@ export default class CertificatesController {
 
   @Get('/organize/:id')
   async getCertificateByOrgnizeId(@Param('id') id: string){
-    return this.certificateService.findByUserId(id)
+    return this.certificateService.findByUserId(id);
   }
   
   @Get('/organizeFullBadge/:id')

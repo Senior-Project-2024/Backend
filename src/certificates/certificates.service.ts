@@ -232,6 +232,56 @@ export class CertificatesService {
     ]).toArray()
   }
 
+  // findByฺBadgeId which be fullBadgeRequired
+  async findByIdWithBadgename(userId: string){
+    return this.certificateRepo.aggregate([
+      {
+        $match : {
+          _id : new ObjectId(userId)
+        }
+      },
+      {
+        $unwind: '$badgeRequired'
+      },
+      {
+        $addFields: {
+          badgeRequiredTemp: { $toObjectId: '$badgeRequired'}
+        }
+      },
+      {
+        $lookup : {
+          from: "badge",
+          localField: "badgeRequiredTemp",
+          foreignField: "_id",
+          as: "MovieDetails",
+        }
+      },
+      {
+        $group : { 
+          _id : "$_id",
+          fullBadgeRequire : { $push : {$arrayElemAt: [ "$MovieDetails", 0 ]}},
+          doc : { $first :"$$ROOT"}
+        }
+      },
+      {
+        $addFields: {
+          "doc.fullBadgeRequire" : '$fullBadgeRequire'
+        }
+      },
+      {
+        $replaceRoot: {
+          newRoot: '$doc'
+        }
+      },
+      {
+        $unset: [
+          "MovieDetails"
+        ]
+        
+      }
+    ]).toArray()
+  }
+
   async update(id: string, attrs: Partial<Certificate>): Promise<Certificate> {
     const certificate = await this.findOne(id);
 
@@ -559,7 +609,7 @@ export class CertificatesService {
     })
     
     /* Get CertificateTemplete */
-    const ceritificateTemplateDB : Certificate = await this.findOne(userPocketCertificateWithId[0].templateCode)
+    const ceritificateTemplateDB : any[] = await this.findByIdWithBadgename(userPocketCertificateWithId[0].templateCode)
 
     /* Get User from DB */
     const userDetail = await this.userService.findByPublicKey(addressFromId.slice(2))
@@ -569,7 +619,7 @@ export class CertificatesService {
     }
 
     return {
-      ...ceritificateTemplateDB,
+      ...ceritificateTemplateDB["0"],
       id : userPocketCertificateWithId[0].id,
       issuedBy : userPocketCertificateWithId[0].issuedBy,
       issuedDate : DateUtil.unixToDateString(Number(userPocketCertificateWithId[0].issueUnixTime)),
