@@ -56,7 +56,8 @@ export class AppModule {
         keys: ['asdasdasd'],
         sameSite: 'lax',
         secure: true,
-        domain: '.proveself.me' 
+        domain: '.proveself.me',
+        httpOnly: true,
       })
     )
     .forRoutes('*');
