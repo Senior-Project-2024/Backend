@@ -106,6 +106,8 @@ export class UserController {
     if(user.role === UserRole.organization) {
       session.organizeId = user.id;
     } 
+
+    console.log(session);
     return user;
   }
 
