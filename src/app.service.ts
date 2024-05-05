@@ -85,7 +85,7 @@ export class AppService {
         issuedTo: `${user.fName} ${user.lName}`,
         issueBy: tokenResult.issuedBy, 
         issueDate: `${issueDateConverter[1]} ${issueDateConverter[2]} ${issueDateConverter[3]}`,
-        expiredDate: Number(tokenResult.expireUnixTime) === 0 ? null : `${expireDateConverter[1]} ${expireDateConverter[2]} ${expireDateConverter[3]}`,
+        expiredDate: Number(tokenResult.expireUnixTime) === 0 ? "none" : `${expireDateConverter[1]} ${expireDateConverter[2]} ${expireDateConverter[3]}`,
       }
 
     }else { // badge
@@ -104,7 +104,7 @@ export class AppService {
         issuedTo: `${user.fName} ${user.lName}`,
         issueBy: tokenResult.issuedBy, 
         issueDate: `${issueDateConverter[1]} ${issueDateConverter[2]} ${issueDateConverter[3]}`,
-        expiredDate: Number(tokenResult.expireUnixTime) === 0 ? null : `${expireDateConverter[1]} ${expireDateConverter[2]} ${expireDateConverter[3]}`,
+        expiredDate: Number(tokenResult.expireUnixTime) === 0 ? "none" : `${expireDateConverter[1]} ${expireDateConverter[2]} ${expireDateConverter[3]}`,
       }
     }
 
