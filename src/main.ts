@@ -15,6 +15,8 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type,Authorization,Set-Cookie',
     credentials: true, 
   });
+
+  app.set('trust proxy', 1);
   
   app.useStaticAssets(resolve('./public'));
   app.setBaseViewsDir(resolve('./views'));
