@@ -54,8 +54,8 @@ export class AppModule {
     consumer.apply(
       cookieSession({
         keys: ['asdasdasd'],
-        sameSite: 'none',
-        secure: true,
+        sameSite: 'lax',
+        secure: false,
         domain: '.proveself.me',
         httpOnly: true,
       })
