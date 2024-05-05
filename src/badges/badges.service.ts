@@ -203,7 +203,7 @@ export class BadgesService {
       const templateBadgeData : Badge = await this.findOne(userBadge.templateCode)
       return {
         ...templateBadgeData,
-        id : userBadge.id,
+        id : Number(userBadge.id),
         issuedBy : userBadge.issuedBy,
         evidenceURL : userBadge.evidenceURL,
         issuedDate : DateUtil.unixToDateString(Number(userBadge.issueUnixTime)),

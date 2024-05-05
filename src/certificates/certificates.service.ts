@@ -560,7 +560,7 @@ export class CertificatesService {
       const templateCertificateData : Certificate = await this.findOne(userCertificate.templateCode)
       return {
         ...templateCertificateData,
-        id : userCertificate.id,
+        id : Number(userCertificate.id),
         issuedBy : userCertificate.issuedBy,
         issuedDate : DateUtil.unixToDateString(Number(userCertificate.issueUnixTime)),
         expireDate : userCertificate.expireUnixTime > 0 ? DateUtil.unixToDateString(Number(userCertificate.expireUnixTime)) : "none",

@@ -6,7 +6,7 @@ import { Web3Account } from 'web3-eth-accounts';
 import { Web3App } from './utils/web3.util';
 
 export type BadgeResp = {
-  id: bigint;
+  id: number;
   issuedBy: string;
   issueUnixTime: bigint;
   expireUnixTime: bigint;
@@ -15,7 +15,7 @@ export type BadgeResp = {
 }
 
 export type CertifcateResp = {
-  id: bigint;
+  id: number;
   issuedBy: string;
   issueUnixTime: bigint;
   expireUnixTime: bigint;
@@ -98,7 +98,7 @@ export class BlockChainService {
     for(let badge of badgeFromContract) {
 
       let newStructBadge: BadgeResp = {
-        id: badge[0],
+        id: Number(badge[0]),
         issuedBy: badge[1],
         issueUnixTime: badge[2],
         expireUnixTime: badge[3],
@@ -119,7 +119,7 @@ export class BlockChainService {
     for(let certificate of certificateFromContract) {
 
       let newStructBadge: CertifcateResp = {
-        id: certificate[0],
+        id: Number(certificate[0]),
         issuedBy: certificate[1],
         issueUnixTime: certificate[2],
         expireUnixTime: certificate[3],

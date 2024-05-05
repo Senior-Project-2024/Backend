@@ -55,7 +55,7 @@ export class AppService {
 
     userBadge.forEach( (badge) => {
 
-      if(badge.id === BigInt(tokenId)) {
+      if(badge.id === tokenId) {
         tokenResult = badge;
       }
 
@@ -64,7 +64,7 @@ export class AppService {
     if(!tokenResult) { // certificate
       userCertificate.forEach( (certificate) => {
 
-        if(certificate.id === BigInt(tokenId)) {
+        if(certificate.id === tokenId) {
           tokenResult = certificate;
         }
 
