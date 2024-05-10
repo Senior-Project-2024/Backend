@@ -14,6 +14,7 @@ import { Badge } from './badges.entity';
 import { CreateBadgeTemplateDto } from './dtos/create-badge-template.dto';
 import { ImageDto } from 'src/dtos/image.dto';
 import { UserService } from 'src/user/user.service';
+import { CertificatesService } from 'src/certificates/certificates.service';
 
 @Injectable() 
 export class BadgesService {
@@ -24,6 +25,7 @@ export class BadgesService {
     private cloudinaryService: CloudinaryService,
     private httpService: HttpService,
     private nftStorageClientUtils: NFTStorageClientUtil,
+    private certificatesService: CertificatesService,
     @InjectRepository(Badge) private badgeRepo: MongoRepository<Badge>
   ) {}
 
@@ -102,7 +104,7 @@ export class BadgesService {
     const badge = await this.findOne(id);
 
     if(!badge) {
-
+      throw new NotFoundException('badge not found!');
     }
 
     return this.badgeRepo.remove(badge);
@@ -275,5 +277,15 @@ export class BadgesService {
     
   }
 
+  async deleteBadge(id: string){
+    const BadgeRequiredLessThan3 = await this.certificatesService.findIdInBadgeRequiredLessThan3(id);
+    if(BadgeRequiredLessThan3.length > 0){
+      throw new NotFoundException("Some certificate will just have 1 badgeRequired")
+    }
+
+    this.remove(id)
+    this.certificatesService.deleteIdBadgeRequiredByBadgeId(id)
+    
+  }
 }
 
