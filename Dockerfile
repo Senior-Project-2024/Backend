@@ -8,7 +8,7 @@ COPY . .
 
 
 #########################
-FROM node:18-alpine as final
+FROM base as final
 
 WORKDIR /app
 
