@@ -15,6 +15,7 @@ import { ContractABI } from 'src/utils/smart-contract/contractABI';
 import { DateUtil } from 'src/utils/date.util';
 import { Badge } from 'src/badges/badges.entity';
 import { UserService } from 'src/user/user.service';
+import { BadgesService } from 'src/badges/badges.service';
 
 export interface BadgeFromDb extends Badge{
   _id: ObjectId;
@@ -127,6 +128,30 @@ export class CertificatesService {
     } 
 
     return this.certificateRepo.find( { where: { userId: new ObjectId(userId) } } );
+  }
+
+  async findIdInBadgeRequiredLessThan3(id: string){
+    const result = await this.certificateRepo.aggregate([
+      {
+        $addFields: {
+          sizeBadgeRequired: { $size : "$badgeRequired" }
+        }
+      },
+      {
+        $match: {badgeRequired: { $all : [id]} }
+      },
+      {
+        $match : {sizeBadgeRequired: {$lt : 3}}
+      }
+    ]).toArray();
+    return result
+  }
+
+  async deleteIdBadgeRequiredByBadgeId(badgeId: string){
+    this.certificateRepo.updateMany({},{
+      // @ts-ignore
+      $pull: { badgeRequired : badgeId} 
+    })
   }
 
   async findWithIdAndLinkCollection(id: string): Promise<Certificate> {
@@ -442,7 +467,6 @@ export class CertificatesService {
     /* add remaining badges in badgeRequired to badgeRequiredResult with isExist: false  */
 
     certificateOfEachOrganize.forEach((certificateOfOrganize) => {
-
       let certificateUserOwned: number[] = [];
 
       certificateOfOrganize.certificates.forEach( (certificate, index) => {
@@ -460,14 +484,13 @@ export class CertificatesService {
           })
           certificate.canMint = false;
         }
-
         /* delete badgeRequired fields */
         delete certificate.badgeRequired;
 
       });
 
       if( certificateUserOwned.length > 0 ) {
-        for(let i = 0; i < certificateUserOwned.length; i++) {
+        for(let i = certificateUserOwned.length - 1; i >= 0; i--) {
           certificateOfOrganize.certificates.splice(certificateUserOwned[i], 1);
         } 
       }
@@ -602,6 +625,8 @@ export class CertificatesService {
     
     const userPocketCertificateFromSmartContract = await contract.methods.getUserCertificatePocket(addressFromId).call()
     const userPocketCertificate: CertifcateResp[] = await this.blockchainService.mappingCertificateFromSol(userPocketCertificateFromSmartContract); 
+    const userPocketBadgeFromSmartContract = await contract.methods.getUserBadgePocket(addressFromId).call()
+    const userPocketBadge: BadgeResp[] = await this.blockchainService.mappingBadgeFromSol(userPocketBadgeFromSmartContract); 
     
     /* Find Id from userPocketCertificate */
     const userPocketCertificateWithId = userPocketCertificate.filter((userCertificate)=>{
@@ -609,17 +634,29 @@ export class CertificatesService {
     })
     
     /* Get CertificateTemplete */
-    const ceritificateTemplateDB : any[] = await this.findByIdWithBadgename(userPocketCertificateWithId[0].templateCode)
+    const certificateTemplateDB : any[] = await this.findByIdWithBadgename(userPocketCertificateWithId[0].templateCode)
+
+    /* Add tokenId on fullBadgeRequire */
+    certificateTemplateDB[0].fullBadgeRequire.forEach( async (badge)=>{
+      let tokenId: number;
+      let i = 0;
+      while( (i < userPocketBadge.length) && !tokenId ){
+        if(userPocketBadge[i].templateCode === badge._id.toString()){
+          tokenId = userPocketBadge[i].id;
+        }
+        i++;
+      }
+      badge.tokenId = tokenId
+    })
 
     /* Get User from DB */
     const userDetail = await this.userService.findByPublicKey(addressFromId.slice(2))
-
     if(userDetail.length === 0){
       throw new NotFoundException('user not found!');
     }
 
     return {
-      ...ceritificateTemplateDB["0"],
+      ...certificateTemplateDB[0],
       id : userPocketCertificateWithId[0].id,
       issuedBy : userPocketCertificateWithId[0].issuedBy,
       issuedDate : DateUtil.unixToDateString(Number(userPocketCertificateWithId[0].issueUnixTime)),

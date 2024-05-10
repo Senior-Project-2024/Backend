@@ -90,7 +90,7 @@ export class BadgesController {
 
   @Delete('/:id')
   async deleteBadge(@Param('id') id: string){
-    return this.badgeService.remove(id)
+    return this.badgeService.deleteBadge(id)
   }
 
   @Get('/:id')

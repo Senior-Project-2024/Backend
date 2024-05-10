@@ -11,7 +11,7 @@ import { HttpModule } from '@nestjs/axios';
 import { NFTStorageClientUtil } from 'src/utils/nft-storage.util';
 
 @Module({
-  imports: [UserModule, TypeOrmModule.forFeature([Badge]), CloudinaryModule, HttpModule],
+  imports: [UserModule, TypeOrmModule.forFeature([Badge]), CloudinaryModule, HttpModule, CertificatesModule],
   controllers: [BadgesController],
   providers: [BadgesService, BlockChainService, NFTStorageClientUtil],
   exports: [BadgesService]
