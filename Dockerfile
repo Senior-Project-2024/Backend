@@ -8,6 +8,10 @@ COPY . .
 
 
 #########################
+
+FROM base as test
+
+#########################
 FROM base as final
 
 WORKDIR /app
