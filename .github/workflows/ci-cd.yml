@@ -61,7 +61,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Unit Testing in Docker
-        run: docker run --rm ghcr.io/tyzaza16/proveself-prod-backend:"$GITHUB_RUN_ID" echo "npm run test:cov"
+        run: docker run --rm ghcr.io/tyzaza16/proveself-prod-backend:"$GITHUB_RUN_ID" echo "npm run test"
 
   # NEXT JOB #######################################################################
   test-integration:
