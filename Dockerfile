@@ -6,7 +6,6 @@ WORKDIR /test
 
 COPY . .
 
-
 #########################
 
 FROM base as test

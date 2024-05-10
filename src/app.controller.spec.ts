@@ -4,11 +4,20 @@ import { AppService } from './app.service';
 
 describe('AppController', () => {
   let appController: AppController;
+  let fakeAppService: Partial<AppService>;
 
   beforeEach(async () => {
+
+    fakeAppService = { 
+      getHello: () => "Hello World!"
+    }
+
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
-      providers: [AppService],
+      providers: [{
+        provide: AppService,
+        useValue: fakeAppService
+      },],
     }).compile();
 
     appController = app.get<AppController>(AppController);
