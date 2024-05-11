@@ -1,15 +1,17 @@
+import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
-import { CertificatesService } from './certificates.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { BlockChainService } from 'src/blockchian.service';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { NFTStorageClientUtil } from 'src/utils/nft-storage.util';
 import { MongoRepository } from 'typeorm';
 import { Certificate } from './certificates.entity';
-import { BlockChainService } from 'src/blockchian.service';
-import { NFTStorageClientUtil } from 'src/utils/nft-storage.util';
-import { HttpService } from '@nestjs/axios';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { CertificatesService } from './certificates.service';
+import { UserService } from 'src/user/user.service';
 
 describe('CertificatesService', () => {
   let service: CertificatesService;
+  let fakeUserService: Partial<UserService>;
   let fakeBlockChainService: Partial<BlockChainService>;
   let fakeNftStorageClientUtils: Partial<NFTStorageClientUtil>;
   let fakeHttpService: Partial<HttpService>;
@@ -20,6 +22,10 @@ describe('CertificatesService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CertificatesService,
+        {
+          provide: UserService,
+          useValue: fakeUserService,
+        },
         {
           provide: BlockChainService,
           useValue: fakeBlockChainService,

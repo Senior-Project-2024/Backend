@@ -6,14 +6,19 @@ import { NFTStorageClientUtil } from 'src/utils/nft-storage.util';
 import { HttpService } from '@nestjs/axios';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Badge } from './badges.entity';
+import { User } from '../user/user.entity';
 import { MongoRepository } from 'typeorm';
+import { UserService } from 'src/user/user.service';
+import { CertificatesService } from 'src/certificates/certificates.service';
 
 describe('BadgesService', () => {
   let service: BadgesService;
+  let fakeUserService: Partial<User>;
   let fakeBlockChainService: Partial<BlockChainService>;
   let fakeCloudinaryService: Partial<CloudinaryService>;
   let fakeHttpService: Partial<HttpService>;
   let fakenftStorageClientService: Partial<NFTStorageClientUtil>;
+  let fakeCertificateService: Partial<CertificatesService>;
   let badgeRepositoyry: MongoRepository<Badge>;
 
 
@@ -21,6 +26,10 @@ describe('BadgesService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         BadgesService,
+        {
+          provide: UserService,
+          useValue: fakeUserService
+        },
         {
           provide: BlockChainService,
           useValue: fakeBlockChainService,
@@ -36,6 +45,10 @@ describe('BadgesService', () => {
         {
           provide: NFTStorageClientUtil,
           useValue: fakenftStorageClientService,
+        },
+        {
+          provide: CertificatesService,
+          useValue: fakeCertificateService,
         },
         {
           provide: getRepositoryToken(Badge),
