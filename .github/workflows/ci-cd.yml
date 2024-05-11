@@ -93,7 +93,7 @@ jobs:
         run: |
           export TESTING_IMAGE=ghcr.io/tyzaza16/proveself-prod-backend:"$GITHUB_RUN_ID"
           echo Testing image: "$TESTING_IMAGE"
-          docker compose -f docker-compose.test.yml up --exit-code-from sut
+          docker compose -f docker-compose-test.yml up --exit-code-from sut
 
   # NEXT JOB #######################################################################
   test-k3d:
