@@ -51,7 +51,7 @@ export class UserController {
     if(user.role === UserRole.user) {
       session.userId = user.id;
       session.userWalletPrivateKey = user.ethWallet.privateKey;
-      const redirectURL_with_params = redirectURL + "?userId=" + user.id + "&publickey=" + user.ethWallet.address
+      const redirectURL_with_params = redirectURL + "?userId=" + user.id + "&publickey=" + user.ethWallet.address;
       return res.json({ statusCode: 201, message: 'login success', redirectURL : redirectURL_with_params  });
     }
 
@@ -70,9 +70,9 @@ export class UserController {
       throw new NotFoundException('Server not found !');
     }
 
-
-    if(user) {
-      res.redirect(redirectURL);
+    if(user && user.role === UserRole.user) {
+      const redirectURL_with_params = redirectURL + "?userId=" + user.id + "&publickey=" + user.keyStoreJsonV3.address;
+      res.redirect(redirectURL_with_params);
     } else {
       return res.status(200).render(
         'form',
