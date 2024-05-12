@@ -75,7 +75,7 @@ export class UserController {
       res.redirect(redirectURL_with_params);
     } else {
       return res.status(200).render(
-        'form',
+        'signInForm',
         { redirectURL, apiHost },
       );
     }
