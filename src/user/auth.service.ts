@@ -136,6 +136,7 @@ export class AuthService {
     const transporter = nodemailer.createTransport({
       host: this.configService.get<string>("MAIL_HOST"),
       port: this.configService.get<number>("MAIL_PORT"),
+      secure: true,
       auth: {
         user: this.configService.get<string>("MAIL_USER"),
         pass: this.configService.get<string>("MAIL_PASSWORD")
