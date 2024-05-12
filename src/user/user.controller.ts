@@ -30,7 +30,8 @@ export class UserController {
   constructor(
     private userService: UserService,
     private authService: AuthService,
-    private blockchainService: BlockChainService
+    private blockchainService: BlockChainService,
+    private configService: ConfigService
     ) {}
 
   @Post('/headers')
@@ -63,12 +64,19 @@ export class UserController {
     @Res() res: Response, 
     @Query('redirectURL') redirectURL: string) {
 
+    const apiHost = this.configService.get<string>('HOST');
+
+    if(apiHost.length === 0) {
+      throw new NotFoundException('Server not found !');
+    }
+
+
     if(user) {
       res.redirect(redirectURL);
     } else {
       return res.status(200).render(
         'form',
-        { redirectURL },
+        { redirectURL, apiHost },
       );
     }
     

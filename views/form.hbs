@@ -208,7 +208,7 @@
           password : password.value
         }
         
-        fetch("http://localhost:4000/auth/thirdParty?redirectURL={{ redirectURL }}",{
+        fetch("{{ apiHost }}/auth/thirdParty?redirectURL={{ redirectURL }}",{
           method: "POST",
           headers: {
             "Content-Type": "application/json",
