@@ -434,13 +434,16 @@ export class CertificatesService {
 
     /* filter expired badge out  */
     const userPocketBadgeNotExpired: BadgeResp[] = userPocketBadge.filter( (userBadge) => (userBadge.expireUnixTime > DateUtil.currentUnixTime() || userBadge.expireUnixTime == BigInt(0)) ); 
+    
+    if(userPocketBadgeNotExpired.length === 0) {
+      return [];
+    }
 
     /* map which certificate user can mint from user's badge on smart contract */
     userPocketBadgeNotExpired.forEach( (userBadge) => {
       certificateOfEachOrganize = certificateOfEachOrganize.map((certificateEachOrganize) => {
         
         certificateEachOrganize.certificates.forEach((certificate) => {
-
           // if it's undefined or null set it to empthy array
           if(!certificate.badgeRequiredResult) {
             certificate.badgeRequiredResult = [];
@@ -469,7 +472,6 @@ export class CertificatesService {
     /* === stage : two thing to do here !!! */
     /* check if badges required are empty it's mean canMint: true otherwise canMint: false */
     /* add remaining badges in badgeRequired to badgeRequiredResult with isExist: false  */
-
     certificateOfEachOrganize.forEach((certificateOfOrganize) => {
       let certificateUserOwned: number[] = [];
 
@@ -482,10 +484,10 @@ export class CertificatesService {
           certificateUserOwned.push(index);
         }
         else{
+
           certificate.badgeRequired.forEach( (badgeRemaining,index) => {
             certificate.badgeRequiredResult.push({ badgeName: badgeRemaining.name, isExist: false });
-            certificate.badgeRequired.splice(index, 1);
-          })
+          });
           certificate.canMint = false;
         }
         /* delete badgeRequired fields */
