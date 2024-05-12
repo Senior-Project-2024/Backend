@@ -423,6 +423,10 @@ export class CertificatesService {
       }
     ]).toArray() as unknown as modifierCertificateForMint[];
 
+    if(certificateOfEachOrganize.length === 0) {
+      return [];
+    }
+
     /* get user's badge from smart contract */
     const contract: Contract<ContractABI> = this.blockchainService.getSmartContract();
     const userPocketBadgeFromSmartContract: BadgeStructOutput[] = await contract.methods.getUserBadgePocket(userPublickey).call();
