@@ -23,6 +23,7 @@ import { Response } from 'express'
 import { UserSessionDto } from './dtos/user-session.dto';
 import { BlockChainService } from 'src/blockchian.service';
 import { ApiExcludeEndpoint, ApiMovedPermanentlyResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { OrganizeGuard } from 'src/guards/organize.guard';
 
 @Controller('auth')
 // @UseGuards(AuthGuard)
@@ -153,6 +154,7 @@ export class UserController {
 
   @ApiExcludeEndpoint()
   @Post('/apiToken')
+  @UseGuards(OrganizeGuard)
   getApiToken(@CurrentUser(UserRole.organization) organize: User)  {
 
     if(!organize) {

@@ -104,6 +104,7 @@ export class BadgesController {
 
   @Delete('/:id')
   @ApiExcludeEndpoint()
+  @UseGuards(OrganizeGuard)
   async deleteBadge(@Param('id') id: string){
     return this.badgeService.deleteBadge(id)
   }

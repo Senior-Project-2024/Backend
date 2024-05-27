@@ -6,6 +6,7 @@ import { UserRole } from 'src/user/user.constant';
 import { User } from 'src/user/user.entity';
 import { CertificatesService } from './certificates.service';
 import { CreateCertificateTemplateDto } from './dtos/create-certificate-template.dto';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('certificates')
 export default class CertificatesController {
@@ -15,6 +16,7 @@ export default class CertificatesController {
   ) {} 
 
   @Get('mint')
+  @UseGuards(AuthGuard)
   mintBadge(
     @Query('publickey') publicKey: string, 
     @Query('templateCode') templateCode: string,
@@ -90,6 +92,7 @@ export default class CertificatesController {
   }
 
   @Delete('/:id')
+  @UseGuards(OrganizeGuard)
   async deleteCertificate(@Param('id') id: string){
     return this.certificateService.remove(id);
   }
