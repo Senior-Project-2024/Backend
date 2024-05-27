@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Param, Get, Patch, Post, UploadedFile, UseGuards, UseInterceptors, Session, Query, Delete } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { OrganizeGuard } from 'src/guards/organize.guard';
 import { CurrentUser } from 'src/user/decorators/current-user.decorator';
@@ -6,7 +6,6 @@ import { UserRole } from 'src/user/user.constant';
 import { User } from 'src/user/user.entity';
 import { CertificatesService } from './certificates.service';
 import { CreateCertificateTemplateDto } from './dtos/create-certificate-template.dto';
-import { IAppSession } from 'src/utils/interfaces/app-session.interface';
 
 @Controller('certificates')
 export default class CertificatesController {

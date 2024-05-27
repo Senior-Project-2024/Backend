@@ -22,6 +22,7 @@ import { UserSignOutReqDto } from './dtos/user-sign-out.dto';
 import { Response } from 'express'
 import { UserSessionDto } from './dtos/user-session.dto';
 import { BlockChainService } from 'src/blockchian.service';
+import { ApiExcludeEndpoint, ApiMovedPermanentlyResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
 // @UseGuards(AuthGuard)
@@ -35,11 +36,13 @@ export class UserController {
     ) {}
 
   @Post('/headers')
+  @ApiExcludeEndpoint()
   async testHeaders(@Headers() headers: any) {
     console.log(headers);
   }
 
   @Post('thirdParty')
+  @ApiExcludeEndpoint()
   async thirdPartyAuthentication(
     @Body() body: UserSignInReqDto,
     @Res() res: Response,
@@ -59,6 +62,10 @@ export class UserController {
   }
 
   @Get('thirdParty')
+  @ApiTags('ThirdParty')
+  @ApiOkResponse({ description: 'Successful get signIn form for user'})
+  @ApiNotFoundResponse({ description: 'Not found server try again!.'})
+  @ApiMovedPermanentlyResponse({ description: 'User credential exist!.'})
   async thirdPartyAuthenticationForm(
     @CurrentUser() user: User, 
     @Res() res: Response, 
@@ -82,7 +89,7 @@ export class UserController {
     
   }
 
-
+  @ApiExcludeEndpoint()
   @Post('/signup')
   @Serialize(UserResponseDto)
   async createUser(@Body() body: CreateUserDto, @Session() session: IAppSession): Promise<User> {
@@ -101,6 +108,7 @@ export class UserController {
     return user;
   }
 
+  @ApiExcludeEndpoint()
   @Post('/signin')
   @Serialize(UserSignInRespDto)
   async signIn(@Body() body: UserSignInReqDto, @Session() session: IAppSession): Promise<UserSignInRespDto> {
@@ -119,6 +127,7 @@ export class UserController {
     return user;
   }
 
+  @ApiExcludeEndpoint()
   @Get('/whoAmI')
   @Serialize(UserSessionDto)
   getCurrentUser(@CurrentUser() user: User, @CurrentUser(UserRole.organization,) organize: User) {
@@ -127,6 +136,7 @@ export class UserController {
     return { user, organize };
   }
 
+  @ApiExcludeEndpoint()
   @Post('/signout') 
   signOut(@Body() body: UserSignOutReqDto, @Session() session: IAppSession) {
 
@@ -141,6 +151,7 @@ export class UserController {
     
   }
 
+  @ApiExcludeEndpoint()
   @Post('/apiToken')
   getApiToken(@CurrentUser(UserRole.organization) organize: User)  {
 
@@ -151,33 +162,38 @@ export class UserController {
     return this.authService.generateTokenApi(organize.id.toString()); // just save it to database 
   }
   
+  @ApiExcludeEndpoint()
   @Get('/all')
   findAlltable(){
     return this.userService.findAllUser();
   }
   
+  @ApiExcludeEndpoint()
   @Get('/confirmEmail')
   @Redirect()
   confirmEmail(@Query() query : {hashCode : string}, @Session() session : IAppSession){
     return this.authService.confirmEmail(query.hashCode, session.timeStamp);
   }
 
+  @ApiExcludeEndpoint()
   @Get('/:id')
   async findUser(@Param('id') id: string) { // param is only string, we should parseInt before send to servicethis.userService.findOne(id)
     return this.userService.findOne(id);
   }
   
+  @ApiExcludeEndpoint()
   @Get('')
   findAllUsers(@Query('email') email: string) { // not check 
     return this.userService.find(email); 
   }
 
-
+  @ApiExcludeEndpoint()
   @Delete('/:id')
   removeUser(@Param('id') id: string) { // not check
     return this.userService.remove(id);
   }
 
+  @ApiExcludeEndpoint()
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) { // not check
 
@@ -210,6 +226,7 @@ export class UserController {
     return this.userService.update(id, body);
   }
 
+  @ApiExcludeEndpoint()
   @Post('/sendEmail')
   async sendEmail(@Body() body : SendEmailDto, @Session() session : IAppSession ){
     const timeStamp = await this.authService.sendEmail(body.email);
