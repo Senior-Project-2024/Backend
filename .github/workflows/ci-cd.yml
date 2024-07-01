@@ -34,7 +34,7 @@ jobs:
           password: ${{ secrets.MY_GITHUB_TOKEN }}
 
       - name: Build and Push to GHCR
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           tags: ghcr.io/tyzaza16/proveself-prod-backend:${{ github.run_id }}
@@ -242,7 +242,7 @@ jobs:
           # type=semver,pattern={{version}}
 
       - name: Docker Build and Push to GHCR and Docker Hub
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
